@@ -4,7 +4,7 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 const { Wallets, Gateway } = require('fabric-network');
-const MedicalSupply = require('../chaincode-go/medical-supply/medicinecontract.go');
+const MedicalSupply = require('../chaincode-go/medical-supply/medicine.go');
 
 
 // Main function

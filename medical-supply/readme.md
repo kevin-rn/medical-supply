@@ -1,6 +1,6 @@
 ## Start network:
 ```
-cd fabric-samples/commercial-paper
+cd fabric-samples/medical-supply
 ./network-starter.sh
 ```
 ##### To see the Fabric nodes running on the local machine:
@@ -33,6 +33,7 @@ alternatively if port number doesn't work:
 __________________________
 ## Deploying the chaincode (smart contract):
 
+### For customers:
 ```
 cd medical-supply/stakeholders/customers
 ```
@@ -42,11 +43,15 @@ source customers.sh
 ```
 
 ```
-peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode --label cp_0
+peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode-go --label cp_0
 ```
 
 ```
 peer lifecycle chaincode install cp.tar.gz
+```
+
+```
+peer lifecycle chaincode queryinstalled
 ```
 
 ```
@@ -55,6 +60,38 @@ export PACKAGE_ID= <id obtained from previous command>
 
 ```
 peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name papercontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
+```
+### For Regulators:
+```
+cd medical-supply/stakeholders/regulators
+```
+
+```
+source regulators.sh
+```
+
+```
+peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode-go --label cp_0
+```
+
+```
+peer lifecycle chaincode install cp.tar.gz
+```
+
+```
+peer lifecycle chaincode queryinstalled
+```
+
+```
+export PACKAGE_ID= <id obtained from previous command>
+```
+
+```
+peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name papercontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
+```
+
+```
+peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --peerAddresses localhost:7051 --tlsRootCertFiles ${PEER0_ORG1_CA} --peerAddresses localhost:9051 --tlsRootCertFiles ${PEER0_ORG2_CA} --channelID mychannel --name papercontract -v 0 --sequence 1 --tls --cafile $ORDERER_CA --waitForEvent
 ```
 __________________________
 ## Application:

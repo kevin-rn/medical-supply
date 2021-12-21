@@ -4,7 +4,7 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 const { Wallets, Gateway } = require('fabric-network');
-const MedicalSupply = require('../chaincode/lib/medicine.js');
+const MedicalSupply = require('../chaincode-go/medical-supply/medicinecontract.go');
 
 
 // Main function
@@ -33,7 +33,7 @@ async function main() {
         const network = await gateway.getNetwork('mychannel');
 
         console.log('Use org.medstore.medicalsupply smart contract');
-        const contract = await network.getContract('medicalsupply')
+        const contract = await network.getContract('medstore', 'org.medstore.medicalsupply')
 
 
         // Request the medicine:
@@ -57,6 +57,7 @@ async function main() {
             // Disconnect from the gateway
             console.log('Disconnect from Fabric gateway.');
             gateway.disconnect();
+    }
 }
 
 

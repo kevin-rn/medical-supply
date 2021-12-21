@@ -15,7 +15,7 @@ const path = require('path');
 async function main() {
     try {
         // load the network configuration
-        let connectionProfile = yaml.safeLoad(fs.readFileSync('../gateway/connection-org1.yaml', 'utf8'));
+        let connectionProfile = yaml.safeLoad(fs.readFileSync('../configuration/gateway/connection-org1.yaml', 'utf8'));
 
         // Create a new CA client for interacting with the CA.
         const caInfo = connectionProfile.certificateAuthorities['ca.org1.example.com'];

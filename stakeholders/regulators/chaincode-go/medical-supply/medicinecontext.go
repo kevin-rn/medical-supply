@@ -1,4 +1,4 @@
-package medicalsupply
+package stakeholders
 
 import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"

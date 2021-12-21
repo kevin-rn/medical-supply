@@ -1,4 +1,4 @@
-package medicalsupply
+package stakeholders
 
 import (
 	"fmt"

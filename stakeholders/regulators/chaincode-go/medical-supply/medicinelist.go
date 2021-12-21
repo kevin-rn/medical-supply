@@ -1,4 +1,4 @@
-package medicalsupply
+package stakeholders
 
 import (
 	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/regulators/chaincode-go/ledger-api"

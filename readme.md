@@ -1,3 +1,24 @@
+## Error
+
+kevin@vm:~/go/src/github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/application$ node request.js
+/home/kevin/go/src/github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode-go/medical-supply/medicine.go:1
+package medicalsupply
+        ^^^^^^^^^^^^^
+
+SyntaxError: Unexpected identifier
+    at Object.compileFunction (node:vm:352:18)
+    at wrapSafe (node:internal/modules/cjs/loader:1026:15)
+    at Module._compile (node:internal/modules/cjs/loader:1061:27)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1149:10)
+    at Module.load (node:internal/modules/cjs/loader:975:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Module.require (node:internal/modules/cjs/loader:999:19)
+    at require (node:internal/modules/cjs/helpers:102:18)
+    at Object.<anonymous> (/home/kevin/go/src/github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/application/request.js:7:23)
+    at Module._compile (node:internal/modules/cjs/loader:1097:14)
+
+Node.js v17.3.0
+
 ## Start network:
 ```
 cd fabric-samples/medical-supply

@@ -3,11 +3,11 @@
 cd fabric-samples/medical-supply
 ./network-starter.sh
 ```
-##### To see the Fabric nodes running on the local machine:
+#### To see the Fabric nodes running on the local machine:
 ```
 docker ps
 ```
-##### To view the network:
+#### To view the network:
 ```
 docker network inspect fabric_test
 ```
@@ -37,27 +37,28 @@ __________________________
 ```
 cd medical-supply/stakeholders/customers
 ```
-
+#### Sets certain environment variables in command window (administrator) in order to use the correct set of peer binaries, send commands to the address of the organisation peer, and sign requests with the correct cryptographic material.
 ```
 source customers.sh
 ```
-
+#### Package the smart contract into a chaincode.
 ```
-peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode-go --label cp_0
+peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode --label cp_0
 ```
-
+#### Install chaincode
 ```
 peer lifecycle chaincode install cp.tar.gz
 ```
 
+#### Query the installed chaincode to get the package_id (same as when installing the chaincode)
 ```
 peer lifecycle chaincode queryinstalled
 ```
-
+#### Sets package_id as environmental variable.
 ```
 export PACKAGE_ID= <id obtained from previous command>
 ```
-
+##### Approve chaincode for the organisation
 ```
 peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
 ```

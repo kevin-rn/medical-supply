@@ -31,28 +31,25 @@ func main() {
 
 	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	if err != nil {
-		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+		log.Fatalf("\nError setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
 	}
 
 	wallet, err := gateway.NewFileSystemWallet("../identity/user/alice/wallet")
 	if err != nil {
-		log.Fatalf("Failed to create wallet: %v", err)
+		log.Fatalf("\nFailed to create wallet: %v", err)
 	}
 
 	if !wallet.Exists(appUser) {
 		err = populateWallet(wallet)
 		if err != nil {
-			log.Fatalf("Failed to populate wallet contents: %v", err)
+			log.Fatalf("\nFailed to populate wallet contents: %v", err)
 		}
 	}
 
 	ccpPath := filepath.Join(
 		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
+		"configuration",
+		"gateway",
 		"connection-org1.yaml",
 	)
 
@@ -61,13 +58,13 @@ func main() {
 		gateway.WithIdentity(wallet, appUser),
 	)
 	if err != nil {
-		log.Fatalf("Failed to connect to gateway: %v", err)
+		log.Fatalf("\nFailed to connect to gateway: %v", err)
 	}
 	defer gw.Close()
 
 	network, err := gw.GetNetwork(channelName)
 	if err != nil {
-		log.Fatalf("Failed to get network: %v", err)
+		log.Fatalf("\nFailed to get network: %v", err)
 	}
 
 	contract := network.GetContract(chaincodeName)
@@ -76,11 +73,11 @@ func main() {
 	result, err := contract.SubmitTransaction("Request", "Aspirin", "00001",
 		"Pain management", "2022.05.09", "$10", "MedStore")
 	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
 
-	log.Println("============ application ends ============")
+	log.Println("\n============ application ends ============")
 }
 
 func populateWallet(wallet *gateway.Wallet) error {
@@ -97,7 +94,7 @@ func populateWallet(wallet *gateway.Wallet) error {
 		"msp",
 	)
 
-	certPath := filepath.Join(credPath, "signcerts", "cert.pem")
+	certPath := filepath.Join(credPath, "signcerts", "User1@org1.example.com-cert.pem")
 	// read the certificate pem
 	cert, err := ioutil.ReadFile(filepath.Clean(certPath))
 	if err != nil {

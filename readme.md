@@ -97,9 +97,13 @@ peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride o
 __________________________
 ## Application:
 ```
+
+
 cd medical-supply/stakeholders/customers/application/
 
-npm install
+
+javascript: npm install
+golang go: go run app.go
 ```
 
 ## Wallet

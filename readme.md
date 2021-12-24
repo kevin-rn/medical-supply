@@ -1,3 +1,6 @@
+Failed to get network: Failed to create new channel client: event service creation failed: could not get chConfig cache reference: QueryBlockConfig failed: QueryBlockConfig failed: queryChaincode failed: Transaction processing for endorser [localhost:7051]: Endorser Client Status Code: (2) CONNECTION_FAILED. Description: dialing connection on target [localhost:7051]: connection is in TRANSIENT_FAILURE
+
+
 ## Start network:
 ```
 cd fabric-samples/medical-supply

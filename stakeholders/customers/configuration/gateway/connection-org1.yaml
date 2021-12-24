@@ -37,6 +37,11 @@ peers:
     grpcOptions:
       ssl-target-name-override: peer0.org1.example.com
       hostnameOverride: peer0.org1.example.com
+      keep-alive-time: 0s
+      keep-alive-timeout: 20s
+      keep-alive-permit: false
+      fail-fast: false
+      allow-insecure: true
 certificateAuthorities:
   ca.org1.example.com:
     url: https://localhost:7054
@@ -61,3 +66,36 @@ certificateAuthorities:
           
     httpOptions:
       verify: false
+# channels:
+#   mychannel:
+#     orderers:
+#       - orderer.example.com
+#     peers:
+#       peer0.org1.example.com:
+#         endorsingPeer: true
+#         chaincodeQuery: true
+#         ledgerQuery: true
+#         eventSource: true
+
+# orderers:
+#   orderer.example.com:
+#     url: grpcs://localhost:7050
+#     tlsCACerts:
+#       pem: |
+#           -----BEGIN CERTIFICATE-----
+#           MIICCjCCAbGgAwIBAgIUFQmU8j1hCSJmdSoLEa/6BtfzrOAwCgYIKoZIzj0EAwIw
+#           YjELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE5ldyBZb3JrMREwDwYDVQQHEwhOZXcg
+#           WW9yazEUMBIGA1UEChMLZXhhbXBsZS5jb20xFzAVBgNVBAMTDmNhLmV4YW1wbGUu
+#           Y29tMB4XDTIwMDgwNTAzMDcwMFoXDTM1MDgwMjAzMDcwMFowYjELMAkGA1UEBhMC
+#           VVMxETAPBgNVBAgTCE5ldyBZb3JrMREwDwYDVQQHEwhOZXcgWW9yazEUMBIGA1UE
+#           ChMLZXhhbXBsZS5jb20xFzAVBgNVBAMTDmNhLmV4YW1wbGUuY29tMFkwEwYHKoZI
+#           zj0CAQYIKoZIzj0DAQcDQgAETFPVGXkshRigcy4ghTLuooUZ3XsOz2S6DBS56Zm6
+#           VtBczejebMmkFN1+w2LMdIXjSmADgUHujmgZIQSwcLM6U6NFMEMwDgYDVR0PAQH/
+#           BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYEFMOa2JjrXTCBHAE8
+#           BRUZ8PSeqEjIMAoGCCqGSM49BAMCA0cAMEQCIFNo8kBg664OZHXP8KctX/oLwWPq
+#           9H+yTvryIAlLXN+KAiBGa+lWjXfA924x0CEyWLjnxe8IZnNG+gKV3kpQF/A9KQ==
+#           -----END CERTIFICATE-----
+
+#     grpcOptions:
+#       ssl-target-name-override: orderer.example.com
+#       hostnameOverride: orderer.example.com

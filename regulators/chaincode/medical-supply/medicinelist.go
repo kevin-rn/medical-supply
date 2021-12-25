@@ -1,7 +1,7 @@
 package medicalsupply
 
 import (
-	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode/ledger-api"
+	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/regulators/chaincode/ledger-api"
 )
 
 type ListInterface interface {

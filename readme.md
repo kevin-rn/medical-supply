@@ -23,7 +23,7 @@ __________________________
 ## Monitor network as Customers or Regulators:
 Go to the folder, for example:
 ```
-cd medical-supply/stakeholders/customers
+cd medical-supply/customers
 ```
 
 To show output from the Docker containers:
@@ -39,7 +39,7 @@ __________________________
 
 ### For customers:
 ```
-cd medical-supply/stakeholders/customers
+cd medical-supply/customers
 ```
 #### Sets certain environment variables in command window (administrator) in order to use the correct set of peer binaries, send commands to the address of the organisation peer, and sign requests with the correct cryptographic material.
 ```
@@ -47,11 +47,11 @@ source customers.sh
 ```
 #### Package the smart contract into a chaincode.
 ```
-peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode --label cp_0
+peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
 ```
 #### Install chaincode
 ```
-peer lifecycle chaincode install cp.tar.gz
+peer lifecycle chaincode install ms-chaincode.tar.gz
 ```
 
 #### Query the installed chaincode to get the package_id (same as when installing the chaincode)
@@ -68,7 +68,7 @@ peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHo
 ```
 ### For Regulators:
 ```
-cd medical-supply/stakeholders/regulators
+cd medical-supply/regulators
 ```
 
 ```
@@ -76,11 +76,11 @@ source regulators.sh
 ```
 
 ```
-peer lifecycle chaincode package cp.tar.gz --lang node --path ./chaincode --label cp_0
+peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
 ```
 
 ```
-peer lifecycle chaincode install cp.tar.gz
+peer lifecycle chaincode install ms-chaincode.tar.gz
 ```
 
 ```
@@ -103,7 +103,7 @@ __________________________
 ```
 
 
-cd medical-supply/stakeholders/customers/application/
+cd medical-supply/customers/application/
 
 
 javascript: npm install

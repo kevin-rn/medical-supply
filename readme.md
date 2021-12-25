@@ -1,11 +1,6 @@
-2021-12-25 13:08:03.756 CET [cli.lifecycle.chaincode] submitInstallProposal -> INFO 001 Installed remotely: response:<status:200 payload:"\nEcp_0:a1d0f75c8b4e5d8fb4645155cc6a53a135f418bc23b7a256f3bd98e3d90aef1c\022\004cp_0" > 
-2021-12-25 13:08:03.756 CET [cli.lifecycle.chaincode] submitInstallProposal -> INFO 002 Chaincode code package identifier: cp_0:a1d0f75c8b4e5d8fb4645155cc6a53a135f418bc23b7a256f3bd98e3d90aef1c
+2021-12-25 13:08:03.756 CET [cli.lifecycle.chaincode] submitInstallProposal -> INFO 001 Installed remotely: response:<status:200 payload:"\nEcp_0:a1d0f75c8b4e5d8fb4645155cc6a53a135f418bc23b7a256f3bd98e3d90aef1c\022\004cp_0" > 2021-12-25 13:08:03.756 CET [cli.lifecycle.chaincode] submitInstallProposal -> INFO 002 Chaincode code package identifier: cp_0:a1d0f75c8b4e5d8fb4645155cc6a53a135f418bc23b7a256f3bd98e3d90aef1c
 
-$chaincodeOut = peer lifecycle chaincode install cp.tar.gz
-if ($chaincodeOut -match "(?<=Chaincode code package identifier: )(.*)") { 
-    export PACKAGE_ID=$matches[0]
-}
-
+$chaincodeOut = peer lifecycle chaincode install cp.tar.gz if ($chaincodeOut -match "(?<=Chaincode code package identifier: )(.*)") { export PACKAGE_ID=$matches[0] }
 
 ## Start network:
 ```

@@ -1,6 +1,6 @@
-module github.com/hyperledger/fabric-samples/medical-supply/stakeholders/regulators/chaincode-go
+module github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode-go
 
-go 1.13
+go 1.14
 
 require (
 	github.com/go-openapi/jsonreference v0.19.3 // indirect

@@ -1,7 +1,7 @@
-package main
+package medicalsupply
 
 import (
-	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/regulators/chaincode/ledger-api"
+	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode/ledger-api"
 )
 
 type ListInterface interface {
@@ -35,7 +35,7 @@ func (msl *list) UpdateMedicine(medicine *MedicalSupply) error {
 func newList(ctx TransactionContextInterface) *list {
 	statelist := new(ledgerapi.StateList)
 	statelist.Ctx = ctx
-	statelist.Name = "org.medstore.medicalsupply"
+	statelist.Name = "org.medstore.medicalsupplylist"
 	statelist.Deserialize = func(bytes []byte, state ledgerapi.StateInterface) error {
 		return Deserialize(bytes, state.(*MedicalSupply))
 	}

@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	medicalsupply "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode/medical-supply"
+	medicalsupply "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/regulators/chaincode/medical-supply"
 )
 
 func main() {

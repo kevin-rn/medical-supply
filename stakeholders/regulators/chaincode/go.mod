@@ -1,4 +1,4 @@
-module github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode-go
+module github.com/hyperledger/fabric-samples/medical-supply/stakeholders/regulators/chaincode-go
 
 go 1.14
 

@@ -49,6 +49,8 @@ func main() {
 	ccpPath := filepath.Join(
 		"..",
 		"..",
+		"..",
+		"..",
 		"test-network",
 		"organizations",
 		"peerOrganizations",
@@ -85,6 +87,8 @@ func main() {
 func populateWallet(wallet *gateway.Wallet) error {
 	log.Println("============ Populating wallet ============")
 	credPath := filepath.Join(
+		"..",
+		"..",
 		"..",
 		"..",
 		"test-network",

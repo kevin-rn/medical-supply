@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/customers/chaincode/ledger-api"
+	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/stakeholders/regulators/chaincode/ledger-api"
 )
 
 type State uint

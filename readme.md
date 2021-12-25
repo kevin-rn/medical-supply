@@ -1,4 +1,5 @@
-Failed to get network: Failed to create new channel client: event service creation failed: could not get chConfig cache reference: QueryBlockConfig failed: QueryBlockConfig failed: queryChaincode failed: Transaction processing for endorser [localhost:7051]: Endorser Client Status Code: (2) CONNECTION_FAILED. Description: dialing connection on target [localhost:7051]: connection is in TRANSIENT_FAILURE
+2021-12-25 13:08:03.756 CET [cli.lifecycle.chaincode] submitInstallProposal -> INFO 001 Installed remotely: response:<status:200 payload:"\nEcp_0:a1d0f75c8b4e5d8fb4645155cc6a53a135f418bc23b7a256f3bd98e3d90aef1c\022\004cp_0" > 
+2021-12-25 13:08:03.756 CET [cli.lifecycle.chaincode] submitInstallProposal -> INFO 002 Chaincode code package identifier: cp_0:a1d0f75c8b4e5d8fb4645155cc6a53a135f418bc23b7a256f3bd98e3d90aef1c
 
 
 ## Start network:

@@ -7,6 +7,7 @@ import (
 type ListInterface interface {
 	AddMedicine(*MedicalSupply) error
 	GetMedicine(string, string) (*MedicalSupply, error)
+	GetAllMedicine(string, string) ([]*MedicalSupply, error)
 	UpdateMedicine(*MedicalSupply) error
 }
 
@@ -26,6 +27,14 @@ func (msl *list) GetMedicine(medName string, medNumber string) (*MedicalSupply, 
 		return nil, err
 	}
 	return ms, nil
+}
+
+func (msl *list) GetAllMedicine() ([]*MedicalSupply, error) {
+	data, err := msl.statelist.GetAllStates("", "")
+	if data != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func (msl *list) UpdateMedicine(medicine *MedicalSupply) error {

@@ -74,19 +74,18 @@ func main() {
 	contract := network.GetContract(chaincodeName)
 
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
-	result, err := contract.SubmitTransaction("InitLedger")
-	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
+	result, initerr := contract.SubmitTransaction("InitLedger")
+	if initerr != nil {
+		log.Fatalf("Failed to Submit transaction: %v", initerr)
 	}
 	log.Println(string(result))
 
-	// log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	// result, err := contract.SubmitTransaction("Request", "Aspirin", "00001",
-	// 	"Pain management", "2022.05.09", "$10", "MedStore")
-	// if err != nil {
-	// 	log.Fatalf("\nFailed to Submit transaction: %v", err)
-	// }
-	// log.Println(string(result))
+	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
+	result, requesterr := contract.SubmitTransaction("Request", "Aspirin", "00001", "Pain management", "2022.05.09", "$10", "MedStore")
+	if requesterr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", requesterr)
+	}
+	log.Println(string(result))
 
 	log.Println("\n============ application ends ============")
 }

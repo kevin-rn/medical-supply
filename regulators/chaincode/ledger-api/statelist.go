@@ -5,16 +5,22 @@
 package ledgerapi
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	medicalsupply "github.com/hyperledger/fabric-samples/medical-supply/customers/chaincode/medical-supply"
 )
+
+// MedicalSupply - Defines a medicine.
+type MedicalSupply = medicalsupply.MedicalSupply
 
 // StateListInterface functions that a state list
 // should have
 type StateListInterface interface {
 	AddState(StateInterface) error
 	GetState(string, StateInterface) error
+	GetAllStates(string, string) ([]*MedicalSupply, error)
 	UpdateState(StateInterface) error
 }
 
@@ -48,10 +54,40 @@ func (sl *StateList) GetState(key string, state StateInterface) error {
 	if err != nil {
 		return err
 	} else if data == nil {
-		return fmt.Errorf("No state found for %s", key)
+		return fmt.Errorf("no state found for %s", key)
 	}
 
 	return sl.Deserialize(data, state)
+}
+
+func (sl *StateList) GetAllStates(startkey string, endkey string) ([]*MedicalSupply, error) {
+	ledgerStart, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, SplitKey(startkey))
+	ledgerEnd, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, SplitKey(endkey))
+	data, err := sl.Ctx.GetStub().GetStateByRange(ledgerStart, ledgerEnd)
+
+	if err != nil {
+		return nil, err
+	} else if data == nil {
+		return nil, fmt.Errorf("no history on medicines found from MedStore")
+	}
+	defer data.Close()
+
+	var medicines []*MedicalSupply
+	for data.HasNext() {
+		queryResponse, err := data.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		var med MedicalSupply
+		err = json.Unmarshal(queryResponse.Value, &med)
+		if err != nil {
+			return nil, err
+		}
+		medicines = append(medicines, &med)
+	}
+
+	return medicines, nil
 }
 
 // UpdateState puts state into world state. Same as AddState but

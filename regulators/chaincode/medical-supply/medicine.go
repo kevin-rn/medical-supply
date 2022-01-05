@@ -10,16 +10,18 @@ import (
 type State uint
 
 const (
+	// AVAILABLE state for when medicine has been issued
+	AVAILABLE State = iota + 1
 	// REQUESTED state for when medicine has been requested
-	REQUESTED State = iota + 1
+	REQUESTED
 	// SENT state for when a medicine is sent
 	SENT
 )
 
 func (state State) String() string {
-	names := []string{"REQUESTED", "SENT"}
+	names := []string{"AVAILABLE", "REQUESTED", "SENT"}
 
-	if state < REQUESTED || state > SENT {
+	if state < AVAILABLE || state > SENT {
 		return "UNKNOWN"
 	}
 	return names[state-1]
@@ -81,6 +83,11 @@ func (ms *MedicalSupply) GetState() State {
 	return ms.state
 }
 
+// SetAvailable returns the state to available
+func (ms *MedicalSupply) SetAvailable() {
+	ms.state = AVAILABLE
+}
+
 // SetRequested returns the state to requested
 func (ms *MedicalSupply) SetRequested() {
 	ms.state = REQUESTED
@@ -91,7 +98,12 @@ func (ms *MedicalSupply) SetSent() {
 	ms.state = SENT
 }
 
-// IsRequested returns true if state is issued
+// IsAvailable returns true if state is available
+func (ms *MedicalSupply) IsAvailable() bool {
+	return ms.state == AVAILABLE
+}
+
+// IsRequested returns true if state is requested
 func (ms *MedicalSupply) IsRequested() bool {
 	return ms.state == REQUESTED
 }

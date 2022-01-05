@@ -10,8 +10,4 @@ function _exit(){
 
 source customers.sh
 
-peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
-
-peer lifecycle chaincode install ms-chaincode.tar.gz
-
-peer lifecycle chaincode queryinstalled
+peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0 | peer lifecycle chaincode install ms-chaincode.tar.gz

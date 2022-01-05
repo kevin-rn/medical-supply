@@ -97,8 +97,9 @@ func (c *Contract) Request(ctx TransactionContextInterface, medname string, medn
 
 }
 
+// Function for getting all Medicine
 func (c *Contract) CheckHistory(ctx TransactionContextInterface, holder string) ([]*MedicalSupply, error) {
-	medicinelist, err := ctx.GetMedicineList().GetAllMedicine("", "")
+	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
 	if err != nil {
 		return nil, err
 	}
@@ -106,23 +107,17 @@ func (c *Contract) CheckHistory(ctx TransactionContextInterface, holder string) 
 	return medicinelist, nil
 }
 
-// Function for handling send medicine
-func (c *Contract) Send(ctx TransactionContextInterface, medName string, medNumber string, oldHolder string, newHolder string) (*MedicalSupply, error) {
+// Function for handling approving the medicine by marking it with Send (Regulators)
+func (c *Contract) Approve(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if medicine.Holder != oldHolder {
-		return nil, fmt.Errorf("medicine %s:%s is not owned by %s", medName, medNumber, oldHolder)
-	}
-
 	if medicine.IsRequested() {
 		medicine.SetSent()
 	}
-
-	medicine.Holder = newHolder
 
 	err = ctx.GetMedicineList().UpdateMedicine(medicine)
 	if err != nil {

@@ -229,6 +229,11 @@ type ChaincodeStubInterface interface {
 	// detected at validation/commit time. Applications susceptible to this
 	// should therefore not use GetHistoryForKey as part of transactions that
 	// update ledger, and should limit use to read-only chaincode operations.
+	// Starting in Fabric v2.0, the GetHistoryForKey chaincode API
+	// will return results from newest to oldest in terms of ordered transaction
+	// height (block height and transaction height within block).
+	// This will allow applications to efficiently iterate through the top results
+	// to understand recent changes to a key.
 	GetHistoryForKey(key string) (HistoryQueryIteratorInterface, error)
 
 	// GetPrivateData returns the value of the specified `key` from the specified
@@ -345,6 +350,9 @@ type ChaincodeStubInterface interface {
 	// proposal to be included as part of a transaction. The event will be
 	// available within the transaction in the committed block regardless of the
 	// validity of the transaction.
+	// Only a single event can be included in a transaction, and must originate
+	// from the outer-most invoked chaincode in chaincode-to-chaincode scenarios.
+	// The marshaled ChaincodeEvent will be available in the transaction's ChaincodeAction.events field.
 	SetEvent(name string, payload []byte) error
 }
 

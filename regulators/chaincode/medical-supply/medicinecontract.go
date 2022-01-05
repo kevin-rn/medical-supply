@@ -26,7 +26,7 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 		{MedName: "Zestril", MedNumber: "00007", Disease: "Blood pressure", Expiration: "2022.03.11", Price: "$7", Holder: "MedStore"},
 		{MedName: "Lipitor", MedNumber: "00008", Disease: "High cholesterol", Expiration: "2022.01.06", Price: "$12", Holder: "MedStore"},
 		{MedName: "Glucophage", MedNumber: "00009", Disease: "Type 2 diabetes", Expiration: "2022.04.24", Price: "$8", Holder: "MedStore"},
-		{MedName: "Zofran", MedNumber: "00010", Disease: "Nausea", Expiration: "2022.02.04", Price: "$13", Holder: "MedStore"},
+		{MedName: "Zofran", MedNumber: "00010", Disease: "Fever", Expiration: "2022.02.04", Price: "$13", Holder: "MedStore"},
 		{MedName: "Ibuprofen", MedNumber: "00011", Disease: "Fever", Expiration: "2022.02.28", Price: "$12", Holder: "MedStore"},
 	}
 	for _, med := range medicines {

@@ -27,7 +27,7 @@ const (
 )
 
 func main() {
-	log.Println("============ application starts ============")
+	log.Println("============ Application starts ============")
 
 	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	if err != nil {
@@ -44,6 +44,8 @@ func main() {
 		if err != nil {
 			log.Fatalf("\nFailed to populate wallet contents: %v", err)
 		}
+	} else {
+		log.Println("============ Sucessfully populated wallet ============")
 	}
 
 	ccpPath := filepath.Join(
@@ -87,11 +89,10 @@ func main() {
 	}
 	log.Println(string(result))
 
-	log.Println("\n============ application ends ============")
+	log.Println("\n============ Application ends ============")
 }
 
 func populateWallet(wallet *gateway.Wallet) error {
-	log.Println("============ Populating wallet ============")
 	credPath := filepath.Join(
 		"..",
 		"..",

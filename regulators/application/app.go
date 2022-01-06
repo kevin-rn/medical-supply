@@ -31,19 +31,21 @@ func main() {
 
 	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	if err != nil {
-		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+		log.Fatalf("\nError setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
 	}
 
-	wallet, err := gateway.NewFileSystemWallet("../identity/user/alice/wallet")
+	wallet, err := gateway.NewFileSystemWallet("wallet")
 	if err != nil {
-		log.Fatalf("Failed to create wallet: %v", err)
+		log.Fatalf("\nFailed to create wallet: %v", err)
 	}
 
 	if !wallet.Exists(appUser) {
 		err = populateWallet(wallet)
 		if err != nil {
-			log.Fatalf("Failed to populate wallet contents: %v", err)
+			log.Fatalf("\nFailed to populate wallet contents: %v", err)
 		}
+	} else {
+		log.Println("============ Sucessfully populated wallet ============")
 	}
 
 	ccpPath := filepath.Join(
@@ -54,7 +56,7 @@ func main() {
 		"organizations",
 		"peerOrganizations",
 		"org2.example.com",
-		"connection-org1.yaml",
+		"connection-org2.yaml",
 	)
 
 	gw, err := gateway.Connect(
@@ -62,29 +64,35 @@ func main() {
 		gateway.WithIdentity(wallet, appUser),
 	)
 	if err != nil {
-		log.Fatalf("Failed to connect to gateway: %v", err)
+		log.Fatalf("\nFailed to connect to gateway: %v", err)
 	}
 	defer gw.Close()
 
 	network, err := gw.GetNetwork(channelName)
 	if err != nil {
-		log.Fatalf("Failed to get network: %v", err)
+		log.Fatalf("\nFailed to get network: %v", err)
 	}
 
 	contract := network.GetContract(chaincodeName)
 
-	// log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	// result, err := contract.SubmitTransaction("Request")
-	// if err != nil {
-	// 	log.Fatalf("Failed to Submit transaction: %v", err)
+	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
+	result, initerr := contract.SubmitTransaction("InitLedger")
+	if initerr != nil {
+		log.Fatalf("Failed to Submit transaction: %v", initerr)
+	}
+	log.Println(string(result))
+
+	// log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
+	// result, requesterr := contract.SubmitTransaction("Issue", "Aspirin", "00001", "Pain management", "2022.05.09", "$10")
+	// if requesterr != nil {
+	// 	log.Fatalf("\nFailed to Submit transaction: %v", requesterr)
 	// }
 	// log.Println(string(result))
 
-	log.Println("============ application ends ============")
+	log.Println("\n============ application ends ============")
 }
 
 func populateWallet(wallet *gateway.Wallet) error {
-	log.Println("============ Populating wallet ============")
 	credPath := filepath.Join(
 		"..",
 		"..",
@@ -94,7 +102,7 @@ func populateWallet(wallet *gateway.Wallet) error {
 		"peerOrganizations",
 		"org2.example.com",
 		"users",
-		"User2@org2.example.com",
+		"User1@org2.example.com",
 		"msp",
 	)
 

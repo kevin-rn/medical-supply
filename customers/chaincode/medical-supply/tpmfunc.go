@@ -1,17 +1,35 @@
-package medicalsupply
+package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/google/go-tpm/tpm2"
 )
 
 var (
-	srkTemplate = tpm2.Public{
-		Type:       tpm2.AlgRSA,
-		NameAlg:    tpm2.AlgSHA256,
-		Attributes: tpm2.FlagFixedTPM | tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin | tpm2.FlagUserWithAuth | tpm2.FlagRestricted | tpm2.FlagDecrypt | tpm2.FlagNoDA,
-		AuthPolicy: nil,
+	handleNames = map[string][]tpm2.HandleType{
+		"all":       []tpm2.HandleType{tpm2.HandleTypeLoadedSession, tpm2.HandleTypeSavedSession, tpm2.HandleTypeTransient},
+		"loaded":    []tpm2.HandleType{tpm2.HandleTypeLoadedSession},
+		"saved":     []tpm2.HandleType{tpm2.HandleTypeSavedSession},
+		"transient": []tpm2.HandleType{tpm2.HandleTypeTransient},
+	}
+
+	tpmPath = flag.String("tpm-path", "/dev/tpm0", "Path to the TPM device (character device or a Unix socket).")
+
+	defaultEKTemplate = tpm2.Public{
+		Type:    tpm2.AlgRSA,
+		NameAlg: tpm2.AlgSHA256,
+		Attributes: tpm2.FlagFixedTPM | tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin |
+			tpm2.FlagAdminWithPolicy | tpm2.FlagRestricted | tpm2.FlagDecrypt,
+		AuthPolicy: []byte{
+			0x83, 0x71, 0x97, 0x67, 0x44, 0x84,
+			0xB3, 0xF8, 0x1A, 0x90, 0xCC, 0x8D,
+			0x46, 0xA5, 0xD7, 0x24, 0xFD, 0x52,
+			0xD7, 0x6E, 0x06, 0x52, 0x0B, 0x64,
+			0xF2, 0xA1, 0xDA, 0x1B, 0x33, 0x14,
+			0x69, 0xAA,
+		},
 		RSAParameters: &tpm2.RSAParams{
 			Symmetric: &tpm2.SymScheme{
 				Alg:     tpm2.AlgAES,
@@ -22,60 +40,60 @@ var (
 			ModulusRaw: make([]byte, 256),
 		},
 	}
-	tpmPath = flag.String("tpm-path", "/dev/tpm0", "Path to the TPM device (character device or a Unix socket).")
-	pcr     = flag.Int("pcr", -1, "PCR to seal data to. Must be within [0, 23].")
+
+	// https://github.com/google/go-tpm/blob/master/tpm2/constants.go#L152
+	defaultKeyParams = tpm2.Public{
+		Type:    tpm2.AlgRSA,
+		NameAlg: tpm2.AlgSHA256,
+		Attributes: tpm2.FlagSign | tpm2.FlagRestricted | tpm2.FlagFixedTPM |
+			tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin | tpm2.FlagUserWithAuth,
+		AuthPolicy: []byte{},
+		RSAParameters: &tpm2.RSAParams{
+			Sign: &tpm2.SigScheme{
+				Alg:  tpm2.AlgRSASSA,
+				Hash: tpm2.AlgSHA256,
+			},
+			KeyBits: 2048,
+		},
+	}
+
+	unrestrictedKeyParams = tpm2.Public{
+		Type:    tpm2.AlgRSA,
+		NameAlg: tpm2.AlgSHA256,
+		Attributes: tpm2.FlagFixedTPM | tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin |
+			tpm2.FlagUserWithAuth | tpm2.FlagSign,
+		AuthPolicy: []byte{},
+		RSAParameters: &tpm2.RSAParams{
+			Sign: &tpm2.SigScheme{
+				Alg:  tpm2.AlgRSASSA,
+				Hash: tpm2.AlgSHA256,
+			},
+			KeyBits: 2048,
+		},
+	}
 )
 
-// func seal(string info) (result []byte, retError error) {
-// 	// Connect to the TPM
-// 	rwc, err := tpm2.OpenTPM(*tpmPath)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("can't open TPM %q: %v", tpmPath, err)
-// 	}
-// 	defer func() {
-// 		if err := rwc.Close(); err != nil {
-// 			retError = fmt.Errorf("%v\ncan't close TPM %q: %v", retError, tpmPath, err)
-// 		}
-// 	}()
+func main() {
+	// Sudo chown kevin /dev/tpm0
+	flag.Parse()
+	log.Println("======= Init  ========")
 
-// 	// Create the parent key against which to seal the data
-// 	srkPassword := ""
-// 	srkHandle, _, err := tpm2.CreatePrimary(rwc, tpm2.HandleOwner, tpm2.PCRSelection{}, "", srkPassword, srkTemplate)
-// 	if err != nil {
-// 		return fmt.Errorf("can't create primary key: %v", err)
-// 	}
-// 	defer func() {
-// 		if err := tpm2.FlushContext(rwc, srkHandle); err != nil {
-// 			retErr = fmt.Errorf("%v\nunable to flush SRK handle %q: %v", retErr, srkHandle, err)
-// 		}
-// 	}()
-// 	fmt.Printf("Created parent key with handle: 0x%x\n", srkHandle)
+	rwc, err := tpm2.OpenTPM(*tpmPath)
+	if err != nil {
+		log.Fatalf("can't open TPM %q: %v", tpmPath, err)
+	}
+	defer func() {
+		if err := rwc.Close(); err != nil {
+			log.Fatalf("%v\ncan't close TPM %q: %v", tpmPath, err)
+		}
+	}()
 
-// 	// Note the value of the pcr against which we will seal the data
-// 	pcrVal, err := tpm2.ReadPCR(rwc, pcr, tpm2.AlgSHA256)
-// 	if err != nil {
-// 		return fmt.Errorf("unable to read PCR: %v", err)
-// 	}
-// 	fmt.Printf("PCR %v value: 0x%x\n", pcr, pcrVal)
+	dataToHash := []byte("Hello")
+	hashDigest, hashValidation, hashErr := tpm2.Hash(rwc, tpm2.AlgSHA256, dataToHash, tpm2.HandleOwner)
+	if hashErr != nil {
+		log.Fatalf("Hash failed unexpectedly: %v", err)
+	}
 
-// 	// Get the authorization policy that will protect the data to be sealed
-// 	objectPassword := "objectPassword"
-// 	sessHandle, policy, err := policyPCRPasswordSession(rwc, pcr, objectPassword)
-// 	if err != nil {
-// 		return fmt.Errorf("unable to get policy: %v", err)
-// 	}
-// 	if err := tpm2.FlushContext(rwc, sessHandle); err != nil {
-// 		return fmt.Errorf("unable to flush session: %v", err)
-// 	}
-// 	fmt.Printf("Created authorization policy: 0x%x\n", policy)
+	log.Println("HashDigest: ", hashDigest, "\n HashValidation: ", hashValidation)
 
-// 	// Seal the data to the parent key and the policy
-// 	dataToSeal := []byte("secret")
-// 	fmt.Printf("Data to be sealed: 0x%x\n", dataToSeal)
-// 	privateArea, publicArea, err := tpm2.Seal(rwc, srkHandle, srkPassword, objectPassword, policy, dataToSeal)
-// 	if err != nil {
-// 		return fmt.Errorf("unable to seal data: %v", err)
-// 	}
-// 	fmt.Printf("Sealed data: 0x%x\n", privateArea)
-// 	return publicArea
-// }
+}

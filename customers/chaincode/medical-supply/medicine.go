@@ -43,6 +43,7 @@ type jsonMedicalSupply struct {
 
 // MedicalSupply - Defines a medicine.
 type MedicalSupply struct {
+	CheckSum   string `json:"checkName"`
 	MedName    string `json:"medName"`
 	MedNumber  string `json:"medNumber"`
 	Disease    string `json:"disease"`

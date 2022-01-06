@@ -54,8 +54,10 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 		Price:      price,
 		Holder:     "MedStore",
 	}
+	// Set medicine status to available
 	medicine.SetAvailable()
 
+	// Add the medicine to the medicine list to keep track
 	err := ctx.GetMedicineList().AddMedicine(&medicine)
 	if err != nil {
 		return nil, err

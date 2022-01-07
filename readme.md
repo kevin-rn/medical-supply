@@ -36,32 +36,10 @@ __________________________
 ### For customers:
 ```
 cd medical-supply/customers
-```
-#### Sets certain environment variables in command window (administrator) in order to use the correct set of peer binaries, send commands to the address of the organisation peer, and sign requests with the correct cryptographic material.
-```
+
 source customers.sh
 ```
-#### Package the smart contract into a chaincode.
-```
-peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
-```
-#### Install chaincode
-```
-peer lifecycle chaincode install ms-chaincode.tar.gz
-```
 
-#### Query the installed chaincode to get the package_id (same as when installing the chaincode)
-```
-peer lifecycle chaincode queryinstalled
-```
-#### Sets package_id as environmental variable.
-```
-export PACKAGE_ID= <id obtained from previous command>
-```
-##### Approve chaincode for the organisation
-```
-peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
-```
 ### For Regulators:
 ```
 cd medical-supply/regulators
@@ -69,26 +47,6 @@ cd medical-supply/regulators
 
 ```
 source regulators.sh
-```
-
-```
-peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
-```
-
-```
-peer lifecycle chaincode install ms-chaincode.tar.gz
-```
-
-```
-peer lifecycle chaincode queryinstalled
-```
-
-```
-export PACKAGE_ID= <id obtained from previous command>
-```
-
-```
-peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
 ```
 
 ```

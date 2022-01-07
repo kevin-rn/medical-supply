@@ -80,7 +80,7 @@ func main() {
 	if initerr != nil {
 		log.Fatalf("Failed to Submit transaction: %v", initerr)
 	}
-	log.Println(string(result))
+	log.Println("Transaction succesfully submitted: \n", string(result))
 
 	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
 	result, requesterr := contract.SubmitTransaction("Issue", "Aspirin", "00001", "Pain management", "2022.05.09", "$10")

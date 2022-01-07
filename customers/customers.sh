@@ -18,6 +18,8 @@ function _exit(){
 # Where am I?
 DIR=${PWD}
 
+# Sets certain environment variables in command window (administrator) in order to use the correct set of peer binaries, 
+# send commands to the address of the organisation peer, and sign requests with the correct cryptographic material.
 setGlobalsForCustomer() {
     # Locate the test-network
     cd "${DIR}/../../test-network"
@@ -39,6 +41,7 @@ setGlobalsForCustomer() {
     cd "${DIR}"
 }
 
+# Package the smart contract into a chaincode and installs it.
 installPackageChaincodeCustomer() {
     rm -rf ms-chaincode.tar.gz
     setGlobalsForCustomer
@@ -47,6 +50,7 @@ installPackageChaincodeCustomer() {
     echo "===================== Chaincode is packaged on Customer ===================== "
 }
 
+# Query the installed chaincode to get the package_id and sets it as an environmental variable.
 queryInstalled() {
     peer lifecycle chaincode queryinstalled >&log.txt
     cat log.txt
@@ -54,6 +58,7 @@ queryInstalled() {
     echo "===================== Query installed successful on Customer on channel ===================== "
 }
 
+# Approve chaincode for the organisation.
 approveForMyOrg() {
     peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
     echo "===================== Chaincode approved from org 1 ===================== "

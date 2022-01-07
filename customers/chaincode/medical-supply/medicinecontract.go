@@ -45,8 +45,12 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednumber string,
 	disease string, expiration string, price string) (*MedicalSupply, error) {
 
+	checkSumStr := fmt.Sprintf(medname, mednumber, disease, expiration, price, "MedStore")
+	checksum, _ := tpmHash(checkSumStr)
+
 	// Create MedicalSupply object and set the State to Requested
 	medicine := MedicalSupply{
+		CheckSum:   checksum,
 		MedName:    medname,
 		MedNumber:  mednumber,
 		Disease:    disease,

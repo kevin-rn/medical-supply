@@ -1,4 +1,4 @@
-package main
+package medicalsupply
 
 import (
 	"flag"
@@ -73,11 +73,9 @@ var (
 	}
 )
 
-func main() {
+func tpmHash(input string) ([]byte, *tpm2.Ticket) {
 	// Sudo chown kevin /dev/tpm0
 	flag.Parse()
-	log.Println("======= Init  ========")
-
 	rwc, err := tpm2.OpenTPM(*tpmPath)
 	if err != nil {
 		log.Fatalf("can't open TPM %q: %v", tpmPath, err)
@@ -88,12 +86,11 @@ func main() {
 		}
 	}()
 
-	dataToHash := []byte("Hello")
+	dataToHash := []byte(input)
 	hashDigest, hashValidation, hashErr := tpm2.Hash(rwc, tpm2.AlgSHA256, dataToHash, tpm2.HandleOwner)
 	if hashErr != nil {
 		log.Fatalf("Hash failed unexpectedly: %v", err)
 	}
 
-	log.Println("HashDigest: ", hashDigest, "\n HashValidation: ", hashValidation)
-
+	return hashDigest, hashValidation
 }

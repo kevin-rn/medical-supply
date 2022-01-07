@@ -98,26 +98,10 @@ __________________________
 ## Application:
 ```
 
-
 cd medical-supply/customers/application/
 
 
-javascript: npm install
 golang go: go run app.go
-```
-
-## Wallet
-```
-node enrollUserAlice.js
-ls ../identity/user/alice/wallet/
-cat ../identity/user/alice/wallet/*
-```
-
-## Run an application:
-```
-node <application name>
-
-for example: node issue.js
 ```
 __________________________
 ## Clean (stop) Network:

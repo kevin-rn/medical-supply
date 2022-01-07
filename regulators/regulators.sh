@@ -18,21 +18,54 @@ function _exit(){
 # Where am I?
 DIR=${PWD}
 
-# Locate the test-network
-cd "${DIR}/../../test-network"
-env | sort > $TMPFILE
+setGlobalsForRegulator() {
+    # Locate the test-network
+    cd "${DIR}/../../test-network"
+    env | sort > $TMPFILE
 
-OVERRIDE_ORG="2"
-. ./scripts/envVar.sh
+    OVERRIDE_ORG="2"
+    . ./scripts/envVar.sh
 
-parsePeerConnectionParameters 1 2
+    parsePeerConnectionParameters 1 2
 
-# set the fabric config path
-export FABRIC_CFG_PATH="${DIR}/../../config"
-export PATH="${DIR}/../../bin:${PWD}:$PATH"
+    # set the fabric config path
+    export FABRIC_CFG_PATH="${DIR}/../../config"
+    export PATH="${DIR}/../../bin:${PWD}:$PATH"
 
-env | sort | comm -1 -3 $TMPFILE - | sed -E 's/(.*)=(.*)/export \1="\2"/'
+    env | sort | comm -1 -3 $TMPFILE - | sed -E 's/(.*)=(.*)/export \1="\2"/'
 
-rm $TMPFILE
+    rm $TMPFILE
 
-cd "${DIR}"
+    cd "${DIR}"
+}
+
+
+installPackageChaincodeRegulator() {
+    rm -rf ms-chaincode.tar.gz
+    setGlobalsForRegulator
+    peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
+    peer lifecycle chaincode install ms-chaincode.tar.gz
+    echo "===================== Chaincode is packaged on Customer ===================== "
+}
+
+queryInstalled() {
+    peer lifecycle chaincode queryinstalled >&log.txt
+    cat log.txt
+    PACKAGE_ID=$(sed -n "/${CC_NAME_1}_${VERSION_1}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
+    echo "===================== Query installed successful on Customer on channel ===================== "
+}
+
+approveForMyOrg() {
+    peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
+    echo "===================== Chaincode approved from org 1 ===================== "
+}
+
+commitChaincodeDefinition() {
+    peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --peerAddresses localhost:7051 --tlsRootCertFiles ${PEER0_ORG1_CA} --peerAddresses localhost:9051 --tlsRootCertFiles ${PEER0_ORG2_CA} --channelID mychannel --name medicinecontract -v 0 --sequence 1 --tls --cafile $ORDERER_CA --waitForEvent
+
+}
+
+installPackageChaincodeRegulator
+queryInstalled
+approveForMyOrg
+commitChaincodeDefinition

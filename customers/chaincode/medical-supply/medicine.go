@@ -1,6 +1,7 @@
 package medicalsupply
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -43,7 +44,7 @@ type jsonMedicalSupply struct {
 
 // MedicalSupply - Defines a medicine.
 type MedicalSupply struct {
-	CheckSum   string `json:"checkName"`
+	CheckSum   []byte `json:"checkName"`
 	MedName    string `json:"medName"`
 	MedNumber  string `json:"medNumber"`
 	Disease    string `json:"disease"`
@@ -121,7 +122,14 @@ func (ms *MedicalSupply) GetSplitKey() []string {
 	return []string{ms.MedName, ms.MedNumber}
 }
 
-//-------------------------------------------------------//
+// VerifyChecksum returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
+func (ms *MedicalSupply) VerifyChecksum() bool {
+	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
+	checksum, _ := tpmHash(checkSumStr)
+	comparison := bytes.Compare(ms.CheckSum, checksum)
+	return (comparison == 0)
+
+}
 
 // Serialize formats the medical supply as JSON bytes
 func (ms *MedicalSupply) Serialize() ([]byte, error) {

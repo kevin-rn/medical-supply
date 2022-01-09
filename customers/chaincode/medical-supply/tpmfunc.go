@@ -73,18 +73,18 @@ var (
 	}
 )
 
-func tpmHash(input string) ([]byte, *tpm2.Ticket) {
+func tpmHash(input string) ([]byte, *tpm2.Ticket, error) {
 	// Sudo chown kevin /dev/tpm0
 	flag.Parse()
 	rwc, err := tpm2.OpenTPM(*tpmPath)
 	if err != nil {
-		log.Fatalf("can't open TPM %q: %v", tpmPath, err)
+		return nil, nil, err
 	}
-	defer func() {
-		if err := rwc.Close(); err != nil {
-			log.Fatalf("%v\ncan't close TPM %q: %v", tpmPath, err)
-		}
-	}()
+
+	err = rwc.Close()
+	if err != nil {
+		return nil, nil, err
+	}
 
 	dataToHash := []byte(input)
 	hashDigest, hashValidation, hashErr := tpm2.Hash(rwc, tpm2.AlgSHA256, dataToHash, tpm2.HandleOwner)
@@ -92,5 +92,5 @@ func tpmHash(input string) ([]byte, *tpm2.Ticket) {
 		log.Fatalf("Hash failed unexpectedly: %v", err)
 	}
 
-	return hashDigest, hashValidation
+	return hashDigest, hashValidation, nil
 }

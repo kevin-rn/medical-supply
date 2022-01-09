@@ -123,11 +123,16 @@ func (ms *MedicalSupply) GetSplitKey() []string {
 }
 
 // VerifyChecksum returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
-func (ms *MedicalSupply) VerifyChecksum() bool {
+func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
-	checksum, _ := tpmHash(checkSumStr)
+	checksum, _, tpmError := tpmHash(checkSumStr)
+
+	if tpmError != nil {
+		return false, fmt.Errorf("Can't open TPM: %s", tpmError)
+	}
+
 	comparison := bytes.Compare(ms.CheckSum, checksum)
-	return (comparison == 0)
+	return (comparison == 0), nil
 
 }
 

@@ -46,7 +46,11 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 	disease string, expiration string, price string) (*MedicalSupply, error) {
 
 	checkSumStr := fmt.Sprintf(medname, mednumber, disease, expiration, price, "MedStore")
-	checksum, _ := tpmHash(checkSumStr)
+	checksum, _, tpmError := tpmHash(checkSumStr)
+
+	if tpmError != nil {
+		return nil, fmt.Errorf("Can't open TPM: %s", tpmError)
+	}
 
 	// Create MedicalSupply object and set the State to Requested
 	medicine := MedicalSupply{

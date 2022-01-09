@@ -90,7 +90,7 @@ func main() {
 	log.Println(string(result))
 
 	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	result, requesterr := contract.SubmitTransaction("Request", "Aspirin", "00012", "Alice")
+	result, requesterr := contract.SubmitTransaction("Request", "Aspirin", "00001", "Alice")
 	if requesterr != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", requesterr)
 	}
@@ -101,8 +101,11 @@ func main() {
 	if historyerr != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", historyerr)
 	}
-	log.Println(string(result))
-
+	if len(result) > 0 {
+		log.Println(string(result))
+	} else {
+		log.Println("Ledger has no transaction history.")
+	}
 	log.Println("--> Submit Transaction: Approve, function that approves medicine and changes its state.")
 	result, approveerr := contract.SubmitTransaction("Approve", "Aspirin", "00001")
 	if approveerr != nil {

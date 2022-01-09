@@ -30,7 +30,7 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 		{MedName: "Ibuprofen", MedNumber: "00011", Disease: "Fever", Expiration: "2022.02.28", Price: "$12", Holder: "MedStore"},
 	}
 	for _, med := range medicines {
-
+		med.SetAvailable()
 		err := ctx.GetMedicineList().UpdateMedicine(&med)
 
 		if err != nil {
@@ -114,7 +114,6 @@ func (c *Contract) CheckHistory(ctx TransactionContextInterface, holder string) 
 	if err != nil {
 		return nil, err
 	}
-
 	return medicinelist, nil
 }
 

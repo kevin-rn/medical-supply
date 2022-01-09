@@ -29,7 +29,7 @@ func (state State) String() string {
 
 // CreateMedicalKey - Creates a key for the medical supply (e.g. MedStoreAspirin0000)
 func CreateMedicalKey(medName string, medNumber string) string {
-	return ledgerapi.MakeKey(medName, medNumber)
+	return ledgerapi.MakeKey("MedStore", medName, medNumber)
 }
 
 // Used for managing the fact status is private but want it in the world state.
@@ -59,7 +59,7 @@ type MedicalSupply struct {
 
 // MarshalJSON - Special handler for managing JSON marshalling.
 func (ms MedicalSupply) MarshalJSON() ([]byte, error) {
-	jcp := jsonMedicalSupply{medicalSupplyAlias: (*medicalSupplyAlias)(&ms), State: ms.state, Class: "org.medstore.medicalsupply", Key: ledgerapi.MakeKey(ms.MedName, ms.MedNumber)}
+	jcp := jsonMedicalSupply{medicalSupplyAlias: (*medicalSupplyAlias)(&ms), State: ms.state, Class: "org.medstore.medicalsupply", Key: ledgerapi.MakeKey("MedStore", ms.MedName, ms.MedNumber)}
 
 	return json.Marshal(&jcp)
 }
@@ -118,7 +118,7 @@ func (ms *MedicalSupply) IsSent() bool {
 
 // GetSplitKey returns values which should be used to form key
 func (ms *MedicalSupply) GetSplitKey() []string {
-	return []string{ms.MedName, ms.MedNumber}
+	return []string{"MedStore", ms.MedName, ms.MedNumber}
 }
 
 // VerifyChecksum returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.

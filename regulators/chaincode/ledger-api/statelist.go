@@ -57,15 +57,13 @@ func (sl *StateList) GetState(key string, state StateInterface) error {
 }
 
 func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
-	data, err := sl.Ctx.GetStub().GetStateByRange("", "")
+	resultsIterator, err := sl.Ctx.GetStub().GetStateByPartialCompositeKey("MedStore:MedName:MedNumber", []string{"MedStore"})
 
 	if err != nil {
 		return nil, err
-	} else if data == nil {
-		return nil, fmt.Errorf("no history on medicines found from MedStore")
 	}
 
-	return data, nil
+	return resultsIterator, nil
 }
 
 // UpdateState puts state into world state. Same as AddState but

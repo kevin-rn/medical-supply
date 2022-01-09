@@ -16,7 +16,7 @@ import (
 type StateListInterface interface {
 	AddState(StateInterface) error
 	GetState(string, StateInterface) error
-	GetAllStates(string, string) (shim.StateQueryIteratorInterface, error)
+	GetAllStates() (shim.StateQueryIteratorInterface, error)
 	UpdateState(StateInterface) error
 }
 
@@ -50,16 +50,14 @@ func (sl *StateList) GetState(key string, state StateInterface) error {
 	if err != nil {
 		return err
 	} else if data == nil {
-		return fmt.Errorf("no state found for %s", key)
+		return fmt.Errorf("No state found for %s", key)
 	}
 
 	return sl.Deserialize(data, state)
 }
 
-func (sl *StateList) GetAllStates(startkey string, endkey string) (shim.StateQueryIteratorInterface, error) {
-	ledgerStart, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, SplitKey(startkey))
-	ledgerEnd, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, SplitKey(endkey))
-	data, err := sl.Ctx.GetStub().GetStateByRange(ledgerStart, ledgerEnd)
+func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
+	data, err := sl.Ctx.GetStub().GetStateByRange("", "")
 
 	if err != nil {
 		return nil, err

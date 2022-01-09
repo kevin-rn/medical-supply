@@ -83,9 +83,30 @@ func main() {
 	log.Println("Transaction succesfully submitted: \n", string(result))
 
 	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
-	result, requesterr := contract.SubmitTransaction("Issue", "Aspirin", "00001", "Pain management", "2022.05.09", "$10")
+	result, issueerr := contract.SubmitTransaction("Issue", "Aspirin", "00012", "Pain management", "2022.05.09", "$10")
+	if issueerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", issueerr)
+	}
+	log.Println(string(result))
+
+	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
+	result, requesterr := contract.SubmitTransaction("Request", "Aspirin", "00012", "Alice")
 	if requesterr != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", requesterr)
+	}
+	log.Println(string(result))
+
+	log.Println("--> Submit Transaction: CheckHistory, function shows history.")
+	result, historyerr := contract.SubmitTransaction("CheckHistory", "Alice")
+	if historyerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", historyerr)
+	}
+	log.Println(string(result))
+
+	log.Println("--> Submit Transaction: Approve, function that approves medicine and changes its state.")
+	result, approveerr := contract.SubmitTransaction("Approve", "Aspirin", "00001")
+	if approveerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", approveerr)
 	}
 	log.Println(string(result))
 

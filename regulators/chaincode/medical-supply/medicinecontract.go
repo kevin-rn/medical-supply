@@ -45,12 +45,13 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednumber string,
 	disease string, expiration string, price string) (*MedicalSupply, error) {
 
-	checkSumStr := fmt.Sprintf(medname, mednumber, disease, expiration, price, "MedStore")
-	checksum, _, tpmError := tpmHash(checkSumStr)
+	// checkSumStr := fmt.Sprintf(medname, mednumber, disease, expiration, price, "MedStore")
+	// checksum, _, tpmError := tpmHash(checkSumStr)
 
-	if tpmError != nil {
-		return nil, fmt.Errorf("Can't open TPM: %s", tpmError)
-	}
+	// if tpmError != nil {
+	// 	return nil, fmt.Errorf("Can't open TPM: %s", tpmError)
+	// }
+	checksum := "05010"
 
 	// Create MedicalSupply object and set the State to Requested
 	medicine := MedicalSupply{
@@ -75,7 +76,7 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 }
 
 // Function for handling requested medicine (Customers)
-func (c *Contract) Request(ctx TransactionContextInterface, medname string, mednumber string, holder string, customer string) (*MedicalSupply, error) {
+func (c *Contract) Request(ctx TransactionContextInterface, medname string, mednumber string, customer string) (*MedicalSupply, error) {
 	medicine, err := ctx.GetMedicineList().GetMedicine(medname, mednumber)
 	if err != nil {
 		return nil, err

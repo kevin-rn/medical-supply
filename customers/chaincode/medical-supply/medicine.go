@@ -1,7 +1,6 @@
 package medicalsupply
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -30,7 +29,7 @@ func (state State) String() string {
 
 // CreateMedicalKey - Creates a key for the medical supply (e.g. MedStoreAspirin0000)
 func CreateMedicalKey(medName string, medNumber string) string {
-	return ledgerapi.MakeKey("MedStore", medName, medNumber)
+	return ledgerapi.MakeKey(medName, medNumber)
 }
 
 // Used for managing the fact status is private but want it in the world state.
@@ -44,7 +43,7 @@ type jsonMedicalSupply struct {
 
 // MedicalSupply - Defines a medicine.
 type MedicalSupply struct {
-	CheckSum   []byte `json:"checkName"`
+	CheckSum   string `json:"checkSum"`
 	MedName    string `json:"medName"`
 	MedNumber  string `json:"medNumber"`
 	Disease    string `json:"disease"`
@@ -60,7 +59,7 @@ type MedicalSupply struct {
 
 // MarshalJSON - Special handler for managing JSON marshalling.
 func (ms MedicalSupply) MarshalJSON() ([]byte, error) {
-	jcp := jsonMedicalSupply{medicalSupplyAlias: (*medicalSupplyAlias)(&ms), State: ms.state, Class: "org.medstore.medicalsupply", Key: ledgerapi.MakeKey(ms.MedNumber)}
+	jcp := jsonMedicalSupply{medicalSupplyAlias: (*medicalSupplyAlias)(&ms), State: ms.state, Class: "org.medstore.medicalsupply", Key: ledgerapi.MakeKey(ms.MedName, ms.MedNumber)}
 
 	return json.Marshal(&jcp)
 }
@@ -125,14 +124,14 @@ func (ms *MedicalSupply) GetSplitKey() []string {
 // VerifyChecksum returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
 func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
-	checksum, _, tpmError := tpmHash(checkSumStr)
+	checksum, tpmError := tpmHash(checkSumStr)
 
 	if tpmError != nil {
 		return false, fmt.Errorf("Can't open TPM: %s", tpmError)
 	}
 
-	comparison := bytes.Compare(ms.CheckSum, checksum)
-	return (comparison == 0), nil
+	comparison := ms.CheckSum == checksum
+	return comparison, nil
 
 }
 

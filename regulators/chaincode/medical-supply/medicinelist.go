@@ -32,7 +32,7 @@ func (msl *list) GetMedicine(medName string, medNumber string) (*MedicalSupply, 
 }
 
 func (msl *list) GetAllMedicine() ([]*MedicalSupply, error) {
-	data, err := msl.statelist.GetAllStates("", "")
+	data, err := msl.statelist.GetAllStates()
 	if data != nil {
 		return nil, err
 	}

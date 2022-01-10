@@ -77,39 +77,67 @@ func main() {
 
 	// Initiliase the ledger with mock data.
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
-	result, initerr := contract.SubmitTransaction("InitLedger")
-	if initerr != nil {
-		log.Fatalf("Failed to Submit transaction: %v", initerr)
-	}
-	log.Println(string(result))
-
-	// Handling when regulators issue a new medicine (add to the ledger).
-	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
-	result, issueerr := contract.SubmitTransaction("Issue", "Aspirin", "00012", "Pain management", "2022.05.09", "$10")
-	if issueerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", issueerr)
+	result, err := contract.SubmitTransaction("InitLedger")
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
 
 	// Handling checking the entire transaction history.
 	log.Println("--> Submit Transaction: CheckHistory, function shows history.")
-	result, historyerr := contract.SubmitTransaction("CheckHistory")
-	if historyerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", historyerr)
+	result, err = contract.SubmitTransaction("CheckHistory")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	if len(result) > 0 {
-		log.Println(string(result))
-	} else {
-		log.Println("Ledger has no transaction history.")
-	}
+	printArray(result)
 
-	// Approves a medicine (changes its state from REQUESTED to SEND)
-	log.Println("--> Submit Transaction: Approve, function that approves medicine.")
-	result, approveerr := contract.SubmitTransaction("Approve", "Aspirin", "00001")
-	if approveerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", approveerr)
+	// Handling when regulators issue a new medicine (add to the ledger).
+	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
+	result, err = contract.SubmitTransaction("Issue", "Aspirin", "00012", "Pain management", "2022.05.09", "$10")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
+
+	// Changing status of medicine manually.
+	log.Println("--> Submit Transaction: ChangeStatusMedicine, function sends request for medicine.")
+	result, err = contract.SubmitTransaction("ChangeStatusMedicine", "Aspirin", "00012", "Requested")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+
+	// Changing holder of medicine manually.
+	log.Println("--> Submit Transaction: ChangeHolder, function sends request for medicine.")
+	result, err = contract.SubmitTransaction("ChangeHolder", "Aspirin", "00012", "Bob")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+
+	// Handling regulators wanting to see all requested medicine matching the medicine name.
+	log.Println("--> Submit Transaction: CheckRequestedMedicine, function shows all requested medicine.")
+	result, err = contract.SubmitTransaction("CheckRequestedMedicine")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
+	}
+	printArray(result)
+
+	// Approves a medicine (changes its state from REQUESTED to SEND)
+	log.Println("--> Submit Transaction: ApproveRequest, function that approves medicine.")
+	result, err = contract.SubmitTransaction("ApproveRequest", "Aspirin", "00001")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+
+	// Rejecting a medicine (changes its state from REQUESTED to AVAILABLE)
+	// log.Println("--> Submit Transaction: RejectRequest, function that approves medicine.")
+	// result, err = contract.SubmitTransaction("RejectRequest", "Aspirin", "00001")
+	// if err != nil {
+	// 	log.Fatalf("\nFailed to Submit transaction: %v", err)
+	// }
+	// log.Println(string(result))
 
 	log.Println("\n============ application ends ============")
 }
@@ -153,4 +181,12 @@ func populateWallet(wallet *gateway.Wallet) error {
 	identity := gateway.NewX509Identity(mspID, string(cert), string(key))
 
 	return wallet.Put(appUser, identity)
+}
+
+func printArray(result []byte) {
+	if len(result) > 0 {
+		log.Println(string(result))
+	} else {
+		log.Println("No transactions found on ledger.")
+	}
 }

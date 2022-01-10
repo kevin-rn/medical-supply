@@ -306,7 +306,7 @@ func (c *Contract) ChangeHolder(ctx TransactionContextInterface, medName string,
 		return nil, err
 	}
 
-	if len(customer) < 1 {
+	if len(customer) > 0 {
 		medicine.Holder = customer
 	} else {
 		return nil, fmt.Errorf("Can't change current holder to invalid username.")

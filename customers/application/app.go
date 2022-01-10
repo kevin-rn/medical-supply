@@ -73,31 +73,51 @@ func main() {
 
 	// Initiliase the ledger with mock data.
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
-	result, initerr := contract.SubmitTransaction("InitLedger")
-	if initerr != nil {
-		log.Fatalf("Failed to Submit transaction: %v", initerr)
-	}
-	log.Println("Transaction succesfully submitted: \n", string(result))
-
-	// Handling request from a customer for a certain medicine.
-	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	result, requesterr := contract.SubmitTransaction("Request", "Aspirin", "00001", "Alice")
-	if requesterr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", requesterr)
+	result, err := contract.SubmitTransaction("InitLedger")
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
 
-	// Handling user wanting to check his/her transaction history.
-	log.Println("--> Submit Transaction: CheckUserHistory, function shows history.")
-	result, userhistoryerr := contract.SubmitTransaction("CheckUserHistory", "Alice")
-	if userhistoryerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", userhistoryerr)
+	// // Handling request from a customer for a certain medicine.
+	// log.Println("--> Submit Transaction: Request, function sends request for medicine.")
+	// result, err = contract.SubmitTransaction("Request", "Aspirin", "00001", "Alice")
+	// if err != nil {
+	// 	log.Fatalf("\nFailed to Submit transaction: %v", err)
+	// }
+	// log.Println(string(result))
+
+	// // Handling cancelling request from a customer for a certain medicine.
+	// log.Println("--> Submit Transaction: CancelRequest, function sends request for medicine.")
+	// result, err = contract.SubmitTransaction("CancelRequest", "Aspirin", "00001", "Alice")
+	// if err != nil {
+	// 	log.Fatalf("\nFailed to Submit transaction: %v", err)
+	// }
+	// log.Println(string(result))
+
+	// // Handling user wanting to check his/her transaction history.
+	// log.Println("--> Submit Transaction: CheckUserHistory, function shows history.")
+	// result, err = contract.SubmitTransaction("CheckUserHistory", "Alice")
+	// if err != nil {
+	// 	log.Fatalf("\nFailed to Submit transaction: %v", err)
+	// }
+	// printArray(result)
+
+	// // Handling user wanting to see all available medicine matching the medicine name.
+	// log.Println("--> Submit Transaction: SearchMedicineByName, function shows available medicine matching the medicine name.")
+	// result, err = contract.SubmitTransaction("SearchMedicineByName", "Zestril")
+	// if err != nil {
+	// 	log.Fatalf("\nFailed to Submit transaction: %v", err)
+	// }
+	// printArray(result)
+
+	// Handling user wanting to see all available medicine.
+	log.Println("--> Submit Transaction: CheckAvailableMedicine, function shows all available medicine.")
+	result, err = contract.SubmitTransaction("CheckAvailableMedicine")
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	if len(result) > 0 {
-		log.Println(string(result))
-	} else {
-		log.Println("Ledger has no user transaction history.")
-	}
+	printArray(result)
 
 	log.Println("\n============ Application ends ============")
 }
@@ -141,4 +161,12 @@ func populateWallet(wallet *gateway.Wallet) error {
 	identity := gateway.NewX509Identity(mspID, string(cert), string(key))
 
 	return wallet.Put(appUser, identity)
+}
+
+func printArray(result []byte) {
+	if len(result) > 0 {
+		log.Println(string(result))
+	} else {
+		log.Println("No transactions found on ledger.")
+	}
 }

@@ -75,6 +75,7 @@ func main() {
 
 	contract := network.GetContract(chaincodeName)
 
+	// Initiliase the ledger with mock data.
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
 	result, initerr := contract.SubmitTransaction("InitLedger")
 	if initerr != nil {
@@ -82,12 +83,33 @@ func main() {
 	}
 	log.Println(string(result))
 
-	// log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
-	// result, requesterr := contract.SubmitTransaction("Issue", "Aspirin", "00001", "Pain management", "2022.05.09", "$10")
-	// if requesterr != nil {
-	// 	log.Fatalf("\nFailed to Submit transaction: %v", requesterr)
-	// }
-	// log.Println(string(result))
+	// Handling when regulators issue a new medicine (add to the ledger).
+	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
+	result, issueerr := contract.SubmitTransaction("Issue", "Aspirin", "00012", "Pain management", "2022.05.09", "$10")
+	if issueerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", issueerr)
+	}
+	log.Println(string(result))
+
+	// Handling checking the entire transaction history.
+	log.Println("--> Submit Transaction: CheckHistory, function shows history.")
+	result, historyerr := contract.SubmitTransaction("CheckHistory")
+	if historyerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", historyerr)
+	}
+	if len(result) > 0 {
+		log.Println(string(result))
+	} else {
+		log.Println("Ledger has no transaction history.")
+	}
+
+	// Approves a medicine (changes its state from REQUESTED to SEND)
+	log.Println("--> Submit Transaction: Approve, function that approves medicine.")
+	result, approveerr := contract.SubmitTransaction("Approve", "Aspirin", "00001")
+	if approveerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", approveerr)
+	}
+	log.Println(string(result))
 
 	log.Println("\n============ application ends ============")
 }

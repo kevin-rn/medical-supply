@@ -75,6 +75,7 @@ func main() {
 
 	contract := network.GetContract(chaincodeName)
 
+	// Initiliase the ledger with mock data.
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
 	result, initerr := contract.SubmitTransaction("InitLedger")
 	if initerr != nil {
@@ -82,13 +83,7 @@ func main() {
 	}
 	log.Println("Transaction succesfully submitted: \n", string(result))
 
-	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
-	result, issueerr := contract.SubmitTransaction("Issue", "Aspirin", "00012", "Pain management", "2022.05.09", "$10")
-	if issueerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", issueerr)
-	}
-	log.Println(string(result))
-
+	// Handling request from a customer for a certain medicine.
 	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
 	result, requesterr := contract.SubmitTransaction("Request", "Aspirin", "00001", "Alice")
 	if requesterr != nil {
@@ -96,22 +91,17 @@ func main() {
 	}
 	log.Println(string(result))
 
-	log.Println("--> Submit Transaction: CheckHistory, function shows history.")
-	result, historyerr := contract.SubmitTransaction("CheckHistory", "Alice")
-	if historyerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", historyerr)
+	// Handling user wanting to check his/her transaction history.
+	log.Println("--> Submit Transaction: CheckUserHistory, function shows history.")
+	result, userhistoryerr := contract.SubmitTransaction("CheckUserHistory", "Alice")
+	if userhistoryerr != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", userhistoryerr)
 	}
 	if len(result) > 0 {
 		log.Println(string(result))
 	} else {
-		log.Println("Ledger has no transaction history.")
+		log.Println("Ledger has no user transaction history.")
 	}
-	log.Println("--> Submit Transaction: Approve, function that approves medicine and changes its state.")
-	result, approveerr := contract.SubmitTransaction("Approve", "Aspirin", "00001")
-	if approveerr != nil {
-		log.Fatalf("\nFailed to Submit transaction: %v", approveerr)
-	}
-	log.Println(string(result))
 
 	log.Println("\n============ Application ends ============")
 }

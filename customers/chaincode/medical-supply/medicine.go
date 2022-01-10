@@ -10,29 +10,30 @@ import (
 type State uint
 
 const (
-	// AVAILABLE state for when medicine has been issued
+	// AVAILABLE state for when medicine has been issued.
 	AVAILABLE State = iota + 1
-	// REQUESTED state for when medicine has been requested
+	// REQUESTED state for when medicine has been requested.
 	REQUESTED
-	// SENT state for when a medicine is sent
-	SENT
+	// SEND state for when a medicine is send.
+	SEND
 )
 
+// Changes state enum to string.
 func (state State) String() string {
-	names := []string{"AVAILABLE", "REQUESTED", "SENT"}
+	names := []string{"AVAILABLE", "REQUESTED", "SEND"}
 
-	if state < AVAILABLE || state > SENT {
+	if state < AVAILABLE || state > SEND {
 		return "UNKNOWN"
 	}
 	return names[state-1]
 }
 
-// CreateMedicalKey - Creates a key for the medical supply (e.g. MedStoreAspirin0000)
+// CreateMedicalKey - Creates a key for the medical supply (e.g. MedStore:Aspirin:00001).
 func CreateMedicalKey(medName string, medNumber string) string {
 	return ledgerapi.MakeKey("MedStore", medName, medNumber)
 }
 
-// Used for managing the fact status is private but want it in the world state.
+// Used for managing the fact state is private but still used it in the world state.
 type medicalSupplyAlias MedicalSupply
 type jsonMedicalSupply struct {
 	*medicalSupplyAlias
@@ -79,49 +80,49 @@ func (ms *MedicalSupply) UnmarshalJSON(data []byte) error {
 
 //-------------------------------------------------------//
 
-// GetState returns the state
+// GetState - returns the state.
 func (ms *MedicalSupply) GetState() State {
 	return ms.state
 }
 
-// SetAvailable returns the state to available
+// SetAvailable - returns the state to AVAILABLE.
 func (ms *MedicalSupply) SetAvailable() {
 	ms.state = AVAILABLE
 }
 
-// SetRequested returns the state to requested
+// SetRequested - returns the state to REQUESTED.
 func (ms *MedicalSupply) SetRequested() {
 	ms.state = REQUESTED
 }
 
-// SetSent returns the state to set
-func (ms *MedicalSupply) SetSent() {
-	ms.state = SENT
+// SetSend - returns the state to SEND.
+func (ms *MedicalSupply) SetSend() {
+	ms.state = SEND
 }
 
-// IsAvailable returns true if state is available
+// IsAvailable - returns true if state is AVAILABLE.
 func (ms *MedicalSupply) IsAvailable() bool {
 	return ms.state == AVAILABLE
 }
 
-// IsRequested returns true if state is requested
+// IsRequested - returns true if state is REQUESTED.
 func (ms *MedicalSupply) IsRequested() bool {
 	return ms.state == REQUESTED
 }
 
-// IsSent returns true if state is sent
-func (ms *MedicalSupply) IsSent() bool {
-	return ms.state == SENT
+// IsSend - returns true if state is SEND.
+func (ms *MedicalSupply) IsSend() bool {
+	return ms.state == SEND
 }
 
 //-------------------------------------------------------//
 
-// GetSplitKey returns values which should be used to form key
+// GetSplitKey - returns values which should be used to form key.
 func (ms *MedicalSupply) GetSplitKey() []string {
 	return []string{"MedStore", ms.MedName, ms.MedNumber}
 }
 
-// VerifyChecksum returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
+// VerifyChecksum - returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
 func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
 	checksum, tpmError := tpmHash(checkSumStr)
@@ -135,12 +136,12 @@ func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 
 }
 
-// Serialize formats the medical supply as JSON bytes
+// Serialize formats the medical supply as JSON bytes.
 func (ms *MedicalSupply) Serialize() ([]byte, error) {
 	return json.Marshal(ms)
 }
 
-// Deserialize formats the commercial paper from JSON bytes
+// Deserialize formats the commercial paper from JSON bytes.
 func Deserialize(bytes []byte, ms *MedicalSupply) error {
 	err := json.Unmarshal(bytes, ms)
 

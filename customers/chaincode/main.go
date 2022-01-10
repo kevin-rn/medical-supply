@@ -11,6 +11,8 @@ import (
 	medicalsupply "github.com/hyperledger/fabric-samples/medical-supply/customers/chaincode/medical-supply"
 )
 
+// Main method of the Chaincode (Smart contract).
+// Initialises all important information for when chaincode is packaged and installed on a channel.
 func main() {
 
 	contract := new(medicalsupply.Contract)

@@ -50,12 +50,8 @@ func main() {
 
 	ccpPath := filepath.Join(
 		"..",
-		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
+		"configuration",
+		"gateway",
 		"connection-org1.yaml",
 	)
 
@@ -133,8 +129,8 @@ func populateWallet(wallet *gateway.Wallet) error {
 	if err != nil {
 		return err
 	}
-	if len(files) != 1 {
-		return fmt.Errorf("keystore folder should have contain one file")
+	if len(files) < 1 {
+		return fmt.Errorf("Keystore folder should contain one file")
 	}
 	keyPath := filepath.Join(keyDir, files[0].Name())
 	key, err := ioutil.ReadFile(filepath.Clean(keyPath))

@@ -57,7 +57,7 @@ func (sl *StateList) GetState(key string, state StateInterface) error {
 }
 
 func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
-	resultsIterator, err := sl.Ctx.GetStub().GetStateByPartialCompositeKey("MedStore:MedName:MedNumber", []string{"MedStore"})
+	resultsIterator, err := sl.Ctx.GetStub().GetStateByPartialCompositeKey(sl.Name, []string{"MedStore"})
 
 	if err != nil {
 		return nil, err

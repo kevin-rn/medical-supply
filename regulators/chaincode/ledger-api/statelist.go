@@ -15,6 +15,7 @@ import (
 type StateListInterface interface {
 	AddState(StateInterface) error
 	GetState(string, StateInterface) error
+	GetAllStatesByPartialKey(string) (shim.StateQueryIteratorInterface, error)
 	GetAllStates() (shim.StateQueryIteratorInterface, error)
 	UpdateState(StateInterface) error
 }
@@ -27,7 +28,7 @@ type StateList struct {
 	Deserialize func([]byte, StateInterface) error
 }
 
-// AddState puts state into world state.
+// AddState - Puts state into world state.
 func (sl *StateList) AddState(state StateInterface) error {
 	key, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, state.GetSplitKey())
 	data, err := state.Serialize()
@@ -39,7 +40,7 @@ func (sl *StateList) AddState(state StateInterface) error {
 	return sl.Ctx.GetStub().PutState(key, data)
 }
 
-// GetState returns state from world state.
+// GetState - Returns state from world state.
 // Unmarshalls the JSON into passed state.
 // Key is the split key value used in Add/Update joined using a colon
 func (sl *StateList) GetState(key string, state StateInterface) error {
@@ -55,11 +56,21 @@ func (sl *StateList) GetState(key string, state StateInterface) error {
 	return sl.Deserialize(data, state)
 }
 
-// GetAllStates returns all states from world state.
-func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
+// GetAllStates - Returns all states matching the partial key from world state.
+func (sl *StateList) GetAllStatesByPartialKey(partialkey string) (shim.StateQueryIteratorInterface, error) {
 	// As composite keys have been used, getStateByRange method won't work because of the \u0000 delimiter hyperledger uses.
 	// Therefore for this implementation GetStateByPartialCompositeKey has been used and for each key "MedStore" string
 	// has been attached for easier retrieval.
+	resultsIterator, err := sl.Ctx.GetStub().GetStateByPartialCompositeKey(sl.Name, []string{"MedStore", partialkey})
+	if err != nil {
+		return nil, err
+	}
+
+	return resultsIterator, nil
+}
+
+// GetAllStates - Returns all states from world state.
+func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
 	resultsIterator, err := sl.Ctx.GetStub().GetStateByPartialCompositeKey(sl.Name, []string{"MedStore"})
 	if err != nil {
 		return nil, err
@@ -68,8 +79,7 @@ func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
 	return resultsIterator, nil
 }
 
-// UpdateState puts state into world state. Same as AddState but
-// separate as semantically different
+// UpdateState - Puts state into world state.
 func (sl *StateList) UpdateState(state StateInterface) error {
 	return sl.AddState(state)
 }

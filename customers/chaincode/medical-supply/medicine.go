@@ -18,7 +18,7 @@ const (
 	SEND
 )
 
-// Changes state enum to string.
+// String - Changes state enum to string.
 func (state State) String() string {
 	names := []string{"AVAILABLE", "REQUESTED", "SEND"}
 
@@ -80,49 +80,61 @@ func (ms *MedicalSupply) UnmarshalJSON(data []byte) error {
 
 //-------------------------------------------------------//
 
-// GetState - returns the state.
+// GetState - Returns the state.
 func (ms *MedicalSupply) GetState() State {
 	return ms.state
 }
 
-// SetAvailable - returns the state to AVAILABLE.
+// SetAvailable - Returns the state to AVAILABLE.
 func (ms *MedicalSupply) SetAvailable() {
 	ms.state = AVAILABLE
 }
 
-// SetRequested - returns the state to REQUESTED.
+// SetRequested - Returns the state to REQUESTED.
 func (ms *MedicalSupply) SetRequested() {
 	ms.state = REQUESTED
 }
 
-// SetSend - returns the state to SEND.
+// SetSend - Returns the state to SEND.
 func (ms *MedicalSupply) SetSend() {
 	ms.state = SEND
 }
 
-// IsAvailable - returns true if state is AVAILABLE.
+// IsAvailable - Returns true if state is AVAILABLE.
 func (ms *MedicalSupply) IsAvailable() bool {
 	return ms.state == AVAILABLE
 }
 
-// IsRequested - returns true if state is REQUESTED.
+// IsRequested - Returns true if state is REQUESTED.
 func (ms *MedicalSupply) IsRequested() bool {
 	return ms.state == REQUESTED
 }
 
-// IsSend - returns true if state is SEND.
+// IsSend - Returns true if state is SEND.
 func (ms *MedicalSupply) IsSend() bool {
 	return ms.state == SEND
 }
 
 //-------------------------------------------------------//
 
-// GetSplitKey - returns values which should be used to form key.
+// GetSplitKey - Returns values which should be used to form key.
 func (ms *MedicalSupply) GetSplitKey() []string {
 	return []string{"MedStore", ms.MedName, ms.MedNumber}
 }
 
-// VerifyChecksum - returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
+// InitialiseChecksum - Initialise the checksum value of the MedicalSupply using tpm hashing.
+func (ms *MedicalSupply) InitialiseChecksum() error {
+	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
+	checksum, tpmError := tpmHash(checkSumStr)
+
+	if tpmError != nil {
+		return fmt.Errorf("Can't open TPM: %s", tpmError)
+	}
+	ms.CheckSum = checksum
+	return nil
+}
+
+// VerifyChecksum - Returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
 func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
 	checksum, tpmError := tpmHash(checkSumStr)
@@ -136,12 +148,12 @@ func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 
 }
 
-// Serialize formats the medical supply as JSON bytes.
+// Serialize - Formats the medical supply as JSON bytes.
 func (ms *MedicalSupply) Serialize() ([]byte, error) {
 	return json.Marshal(ms)
 }
 
-// Deserialize formats the commercial paper from JSON bytes.
+// Deserialize - Formats the commercial paper from JSON bytes.
 func Deserialize(bytes []byte, ms *MedicalSupply) error {
 	err := json.Unmarshal(bytes, ms)
 

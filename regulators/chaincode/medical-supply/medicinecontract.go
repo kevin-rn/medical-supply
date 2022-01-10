@@ -2,6 +2,7 @@ package medicalsupply
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
@@ -14,7 +15,7 @@ func (c *Contract) Instantiate() {
 	fmt.Println("- Contract Instantiated -")
 }
 
-// InitLedger adds a base set of medicine (MedicalSupply) to the ledger. [Regulators]
+// InitLedger - Adds a base set of medicine (MedicalSupply) to the ledger. [Regulators]
 func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 	// Create array of MedicalSupply objects.
 	medicines := []MedicalSupply{
@@ -45,22 +46,12 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 	return nil
 }
 
-// Function for handling issued medicine [Regulators]
+// Issue - Function for handling issued medicine [Regulators]
 func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednumber string,
 	disease string, expiration string, price string) (*MedicalSupply, error) {
 
-	// Calculate the checksum by using the hashfunction of the TPM.
-	// checkSumStr := fmt.Sprintf(medname, mednumber, disease, expiration, price, "MedStore")
-	// checksum, _, tpmError := tpmHash(checkSumStr)
-
-	// if tpmError != nil {
-	// 	return nil, fmt.Errorf("Can't open TPM: %s", tpmError)
-	// }
-	checksum := "05010"
-
 	// Create MedicalSupply object.
 	medicine := MedicalSupply{
-		CheckSum:   checksum,
 		MedName:    medname,
 		MedNumber:  mednumber,
 		Disease:    disease,
@@ -68,6 +59,14 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 		Price:      price,
 		Holder:     "MedStore",
 	}
+
+	// Calculate the checksum by using the hashfunction of the TPM.
+	// checksumError := medicine.InitialiseChecksum()
+	// if checksumError != nil {
+	// 	return nil, fmt.Errorf("Could not issue new MedicalSupply. %s", checksumError)
+	// }
+	medicine.CheckSum = "05010"
+
 	// Set state to AVAILABLE.
 	medicine.SetAvailable()
 
@@ -80,7 +79,7 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 	return &medicine, nil
 }
 
-// Function for handling requested medicine. [Customers]
+// Request - Function for handling requested medicine. [Customers]
 func (c *Contract) Request(ctx TransactionContextInterface, medname string, mednumber string, customer string) (*MedicalSupply, error) {
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medname, mednumber)
@@ -115,7 +114,49 @@ func (c *Contract) Request(ctx TransactionContextInterface, medname string, medn
 	return medicine, nil
 }
 
-// Function for getting all Medicine. [Regulators]
+// CancelRequest - Function for handling cancelled requested medicine. [Customers]
+func (c *Contract) CancelRequest(ctx TransactionContextInterface, medName string, medNumber string, customer string) (*MedicalSupply, error) {
+	// Retrieve the medicine from the ledger.
+	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if medicine state is REQUESTED, if so set it to AVAILABLE and reset to holder to be MedStore.
+	if medicine.IsRequested() && medicine.Holder == customer {
+		medicine.SetAvailable()
+		medicine.Holder = "MedStore"
+	} else {
+		return nil, fmt.Errorf("Cannot cancel because medicine has not been requested.")
+	}
+
+	// Update medicine on the ledger
+	err = ctx.GetMedicineList().UpdateMedicine(medicine)
+	if err != nil {
+		return nil, err
+	}
+
+	return medicine, nil
+}
+
+// SearchMedicineByName - Function for getting information on available medicine given the medicine name. [Customers]
+func (c *Contract) SearchMedicineByName(ctx TransactionContextInterface, medName string) ([]*MedicalSupply, error) {
+	// Retrieve the medicine from the ledger.
+	medicinelist, err := ctx.GetMedicineList().GetAllMedicineByName(medName)
+	if err != nil {
+		return nil, err
+	}
+	// Loop through the list and check for AVAILABLE state.
+	var resultlist []*MedicalSupply
+	for _, med := range medicinelist {
+		if med.IsAvailable() {
+			resultlist = append(resultlist, med)
+		}
+	}
+	return resultlist, nil
+}
+
+// CheckHistory - Function for getting an overview of all Medicine. [Regulators]
 func (c *Contract) CheckHistory(ctx TransactionContextInterface) ([]*MedicalSupply, error) {
 	// Get all medicine from the ledger.
 	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
@@ -125,7 +166,7 @@ func (c *Contract) CheckHistory(ctx TransactionContextInterface) ([]*MedicalSupp
 	return medicinelist, nil
 }
 
-// Function for getting all available medicine. [Customers]
+// CheckAvailableMedicine - Function for getting an overview of all available medicine. [Customers]
 func (c *Contract) CheckAvailableMedicine(ctx TransactionContextInterface) ([]*MedicalSupply, error) {
 	// Get all medicine from the ledger (There is currently no efficienter way to retrieve assets from the Ledger for certain fields).
 	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
@@ -143,7 +184,7 @@ func (c *Contract) CheckAvailableMedicine(ctx TransactionContextInterface) ([]*M
 	return resultlist, nil
 }
 
-// Function for getting all requested medicine. [Regulators]
+// CheckRequestedMedicine - Function for getting an overview of all requested medicine. [Regulators]
 func (c *Contract) CheckRequestedMedicine(ctx TransactionContextInterface) ([]*MedicalSupply, error) {
 	// Get all medicine from the ledger.
 	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
@@ -161,7 +202,7 @@ func (c *Contract) CheckRequestedMedicine(ctx TransactionContextInterface) ([]*M
 	return resultlist, nil
 }
 
-// Function for getting all Medicine an User has ordered. [Customers]
+// CheckUserHistory - Function for getting an overview of all medicine an user has ordered. [Customers]
 func (c *Contract) CheckUserHistory(ctx TransactionContextInterface, holder string) ([]*MedicalSupply, error) {
 	// Get all medicine from the ledger.
 	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
@@ -179,8 +220,8 @@ func (c *Contract) CheckUserHistory(ctx TransactionContextInterface, holder stri
 	return resultlist, nil
 }
 
-// Function for handling approving the medicine by changing its state to SEND. [Regulators]
-func (c *Contract) Approve(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
+// ApproveRequest - Function for handling approving the medicine by changing its state to SEND. [Regulators]
+func (c *Contract) ApproveRequest(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
@@ -203,8 +244,8 @@ func (c *Contract) Approve(ctx TransactionContextInterface, medName string, medN
 	return medicine, nil
 }
 
-// Function for handling disapproving the medicine by changing its state back to AVAILABLE. [Regulators]
-func (c *Contract) Disapprove(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
+// RejectRequest - Function for handling disapproving the medicine by changing its state back to AVAILABLE. [Regulators]
+func (c *Contract) RejectRequest(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
@@ -217,6 +258,58 @@ func (c *Contract) Disapprove(ctx TransactionContextInterface, medName string, m
 		medicine.Holder = "MedStore"
 	} else {
 		return nil, fmt.Errorf("Cannot disapprove medicine that has not been requested.")
+	}
+
+	// Update medicine on the ledger
+	err = ctx.GetMedicineList().UpdateMedicine(medicine)
+	if err != nil {
+		return nil, err
+	}
+
+	return medicine, nil
+}
+
+// ChangeStatusMedicine - Function for changing the status of a medicine. [Regulators]
+func (c *Contract) ChangeStatusMedicine(ctx TransactionContextInterface, medName string, medNumber string, status string) (*MedicalSupply, error) {
+	// Retrieve the medicine from the ledger.
+	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	// Match case on status and change it.
+	switch strings.ToLower(status) {
+	case "available":
+		medicine.SetAvailable()
+	case "requested":
+		medicine.SetRequested()
+	case "send":
+		medicine.SetSend()
+	default:
+		return nil, fmt.Errorf("Cannot change status to a non-possible state.")
+	}
+
+	// Update medicine on the ledger
+	err = ctx.GetMedicineList().UpdateMedicine(medicine)
+	if err != nil {
+		return nil, err
+	}
+
+	return medicine, nil
+}
+
+// ChangeHolder - Function for changing the holder of a medicine. [Regulators]
+func (c *Contract) ChangeHolder(ctx TransactionContextInterface, medName string, medNumber string, customer string) (*MedicalSupply, error) {
+	// Retrieve the medicine from the ledger.
+	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(customer) < 1 {
+		medicine.Holder = customer
+	} else {
+		return nil, fmt.Errorf("Can't change current holder to invalid username.")
 	}
 
 	// Update medicine on the ledger

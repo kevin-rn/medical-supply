@@ -1,0 +1,9 @@
+{
+	"network-configs": {
+		"first-network": {
+			"name": "test-network",
+			"profile": "./test-network.json"
+		}
+	},
+	"license": "Apache-2.0"
+}

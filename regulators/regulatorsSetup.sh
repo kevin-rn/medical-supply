@@ -18,6 +18,12 @@ function _exit(){
 # Where am I?
 DIR=${PWD}
 
+# remove old keystore and wallet inside regulators application
+cleanUpCredentials() {
+    rm -rf "${DIR}/application/keystore"
+    rm -rf "${DIR}/application/wallet"
+}
+
 # Sets certain environment variables in command window (administrator) in order to use the correct set of peer binaries, 
 # send commands to the address of the organisation peer, and sign requests with the correct cryptographic material.
 setGlobalsForRegulator() {
@@ -77,6 +83,7 @@ commitChaincodeDefinition() {
     echo "===================== Chaincode definition committed ===================== "
 }
 
+cleanUpCredentials
 installPackageChaincodeRegulator
 queryInstalled
 approveForMyOrg

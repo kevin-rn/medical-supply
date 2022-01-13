@@ -23,4 +23,3 @@ docker kill cliCustomers cliRegulators logspout || true
 
 # remove any stopped containers
 docker rm $(docker ps -aq)
-

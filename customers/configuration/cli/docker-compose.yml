@@ -31,7 +31,7 @@ services:
     command: /bin/bash
     volumes:
         - /var/run/docker.sock:/host/var/run/docker.sock
-        - ./../../../../stakeholders/customers:/opt/gopath/src/github.com/
+        - ./../../../../customers:/opt/gopath/src/github.com/
         - ./../../../../../test-network/organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
     networks:
         - test

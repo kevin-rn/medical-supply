@@ -125,7 +125,7 @@ func main() {
 
 	// Approves a medicine (changes its state from REQUESTED to SEND)
 	log.Println("--> Submit Transaction: ApproveRequest, function that approves medicine.")
-	result, err = contract.SubmitTransaction("ApproveRequest", "Aspirin", "00001")
+	result, err = contract.SubmitTransaction("ApproveRequest", "Aspirin", "00012")
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}

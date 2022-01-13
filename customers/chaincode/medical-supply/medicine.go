@@ -44,7 +44,6 @@ type jsonMedicalSupply struct {
 
 // MedicalSupply - Defines a medicine.
 type MedicalSupply struct {
-	CheckSum   string `json:"checkSum"`
 	MedName    string `json:"medName"`
 	MedNumber  string `json:"medNumber"`
 	Disease    string `json:"disease"`
@@ -120,32 +119,6 @@ func (ms *MedicalSupply) IsSend() bool {
 // GetSplitKey - Returns values which should be used to form key.
 func (ms *MedicalSupply) GetSplitKey() []string {
 	return []string{"MedStore", ms.MedName, ms.MedNumber}
-}
-
-// InitialiseChecksum - Initialise the checksum value of the MedicalSupply using tpm hashing.
-func (ms *MedicalSupply) InitialiseChecksum() error {
-	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
-	checksum, tpmError := tpmHash(checkSumStr)
-
-	if tpmError != nil {
-		return fmt.Errorf("Can't open TPM: %s", tpmError)
-	}
-	ms.CheckSum = checksum
-	return nil
-}
-
-// VerifyChecksum - Returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
-func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
-	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
-	checksum, tpmError := tpmHash(checkSumStr)
-
-	if tpmError != nil {
-		return false, fmt.Errorf("Can't open TPM: %s", tpmError)
-	}
-
-	comparison := ms.CheckSum == checksum
-	return comparison, nil
-
 }
 
 // Serialize - Formats the medical supply as JSON bytes.

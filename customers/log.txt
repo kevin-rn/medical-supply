@@ -1,2 +1,2 @@
 Installed chaincodes on peer:
-Package ID: ms_0:263401ce748b8efbee48cd4d11b08e75aa1d13b9fa2bea881a8dc0e41534891b, Label: ms_0
+Package ID: ms_0:5555ba6568a0b4628521a2aa64f468a36aeccc203d40ad09d7fa78ea0db62966, Label: ms_0

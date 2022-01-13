@@ -60,13 +60,6 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 		Holder:     "MedStore",
 	}
 
-	// Calculate the checksum by using the hashfunction of the TPM.
-	// checksumError := medicine.InitialiseChecksum()
-	// if checksumError != nil {
-	// 	return nil, fmt.Errorf("Could not issue new MedicalSupply. %s", checksumError)
-	// }
-	medicine.CheckSum = "05010"
-
 	// Set state to AVAILABLE.
 	medicine.SetAvailable()
 

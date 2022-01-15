@@ -24,24 +24,15 @@ class MyWorkload extends WorkloadModuleBase {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
     }
 
-    async randomDate() {
-        let year = (2020 + Math.floor(Math.random() * 10)).toString()
-        let month = Math.floor((Math.random() * 12) + 1)
-        let day = Math.floor((Math.random() * 31) + 1)
-        if (month < 10) month = '0' + month;
-        if (day < 10) day = '0' + day;
-        return [year, month, day].join('.');
-    }
-
     async submitTransaction() {
         this.txIndex++;
 
         let medName = this.medName[this.txIndex % this.medName.length];
         const medNumber = `${this.roundIndex}_${this.workerIndex}_${this.txIndex}_${Date.now()}`;
         let disease = this.disease[this.txIndex % this.disease.length];
-        let date = this.randomDate()
+        let date = "2022.02.22"
 
-        let price = Math.floor(Math.random() * 1000).toString() // random number between 0 and 1000
+        let price = Math.floor(Math.random() * 100).toString() // random number between 0 and 100
 
         const request = {
             contractId: this.roundArguments.contractId,

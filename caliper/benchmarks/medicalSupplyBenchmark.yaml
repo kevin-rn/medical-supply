@@ -5,24 +5,24 @@ test:
     type: local
     number: 5
   rounds:
-    - label: issueMedicalSupply
-      description: Create asset benchmark
+    - label: Issue-function
+      description: Issue asset benchmark
       txNumber: 1000
       rateControl:
         { type: "linear-rate", opts: { startingTps: 50, finishingTps: 200 } }
       workload:
-        module: workload/createMS.js
+        module: workload/issue.js
         arguments:
           contractId: medicinecontract
-    # - label: readAsset
-    #   description: Read asset benchmark
-    #   txDuration: 60
-    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }
-    #   workload:
-    #     module: workload/readAsset.js
-    #     arguments:
-    #       assets: 10
-    #       contractId: medicinecontract
+    - label: Request-function
+      description: Request asset benchmark
+      txDuration: 60
+      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }
+      workload:
+        module: workload/request.js
+        arguments:
+          assets: 10
+          contractId: medicinecontract
 
 monitors:
   resource:

@@ -18,6 +18,7 @@ type StateListInterface interface {
 	GetAllStatesByPartialKey(string) (shim.StateQueryIteratorInterface, error)
 	GetAllStates() (shim.StateQueryIteratorInterface, error)
 	UpdateState(StateInterface) error
+	DeleteState(string) error
 }
 
 // StateList useful for managing putting data in and out of the ledger.
@@ -82,4 +83,10 @@ func (sl *StateList) GetAllStates() (shim.StateQueryIteratorInterface, error) {
 // UpdateState - Puts state into world state.
 func (sl *StateList) UpdateState(state StateInterface) error {
 	return sl.AddState(state)
+}
+
+// DeleteState - Deletes state from world state.
+func (sl *StateList) DeleteState(key string) error {
+	ledgerKey, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, SplitKey(key))
+	return sl.Ctx.GetStub().DelState(ledgerKey)
 }

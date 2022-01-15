@@ -40,7 +40,8 @@ func main() {
 		"5 - Change holder of medicine \n" +
 		"6 - Check all requested medicine \n" +
 		"7 - Approve request for medicine \n" +
-		"8 - Reject request for medicine")
+		"8 - Reject request for medicine \n" +
+		"9 - Delete medicine")
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
@@ -63,6 +64,8 @@ func main() {
 		approveRequest(contract, scanner)
 	case "8":
 		rejectRequest(contract, scanner)
+	case "9":
+		delete(contract, scanner)
 	default:
 		log.Fatalf("\n Error: Function to invoke not found.")
 	}
@@ -288,6 +291,23 @@ func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 
 	log.Println("--> Submit Transaction: RejectRequest, function that approves medicine.")
 	result, err := contract.SubmitTransaction("RejectRequest", medName, medNumber)
+	if err != nil {
+		log.Fatalf("\nFailed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+}
+
+// Deletes a medicine
+func delete(contract *gateway.Contract, scanner *bufio.Scanner) {
+	log.Println("Medicine name (e.g. Aspirin):")
+	scanner.Scan()
+	medName := scanner.Text()
+	log.Println("Medicine number (e.g. 00001):")
+	scanner.Scan()
+	medNumber := scanner.Text()
+
+	log.Println("--> Submit Transaction: Delete, function that approves medicine.")
+	result, err := contract.SubmitTransaction("Delete", medName, medNumber)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}

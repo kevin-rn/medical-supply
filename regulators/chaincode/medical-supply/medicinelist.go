@@ -6,13 +6,14 @@ import (
 	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/regulators/chaincode/ledger-api"
 )
 
-// ListInterface - Ffunctions which a medicinelist should have.
+// ListInterface - Functions which a medicinelist should have.
 type ListInterface interface {
 	AddMedicine(*MedicalSupply) error
 	GetMedicine(string, string) (*MedicalSupply, error)
 	GetAllMedicineByName(string) ([]*MedicalSupply, error)
 	GetAllMedicine() ([]*MedicalSupply, error)
 	UpdateMedicine(*MedicalSupply) error
+	DeleteMedicine(string, string) error
 }
 
 type list struct {
@@ -94,6 +95,11 @@ func (msl *list) GetAllMedicine() ([]*MedicalSupply, error) {
 // UpdateMedicine - Update medicine (MedicalSupply object) on the statelist.
 func (msl *list) UpdateMedicine(medicine *MedicalSupply) error {
 	return msl.statelist.UpdateState(medicine)
+}
+
+// GetMedicine - Retrieves medicine from the statelist.
+func (msl *list) DeleteMedicine(medName string, medNumber string) error {
+	return msl.statelist.DeleteState(CreateMedicalKey(medName, medNumber))
 }
 
 // newList - Create new statelist.

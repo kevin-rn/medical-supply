@@ -13,6 +13,7 @@ type ListInterface interface {
 	GetAllMedicineByName(string) ([]*MedicalSupply, error)
 	GetAllMedicine() ([]*MedicalSupply, error)
 	UpdateMedicine(*MedicalSupply) error
+	DeleteMedicine(string, string) error
 }
 
 type list struct {
@@ -94,6 +95,11 @@ func (msl *list) GetAllMedicine() ([]*MedicalSupply, error) {
 // UpdateMedicine - Update medicine (MedicalSupply object) on the statelist.
 func (msl *list) UpdateMedicine(medicine *MedicalSupply) error {
 	return msl.statelist.UpdateState(medicine)
+}
+
+// GetMedicine - Retrieves medicine from the statelist.
+func (msl *list) DeleteMedicine(medName string, medNumber string) error {
+	return msl.statelist.DeleteState(CreateMedicalKey(medName, medNumber))
 }
 
 // newList - Create new statelist.

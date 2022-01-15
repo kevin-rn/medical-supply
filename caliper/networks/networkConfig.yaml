@@ -23,3 +23,14 @@ organizations:
     connectionProfile:
       path: "../../test-network/organizations/peerOrganizations/org1.example.com/connection-org1.yaml"
       discover: true
+  - mspid: Org2MSP
+    identities:
+      certificates:
+        - name: "bob"
+          clientPrivateKey:
+            path: "../../test-network/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/keystore/priv_sk"
+          clientSignedCert:
+            path: "../../test-network/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/signcerts/cert.pem"
+    connectionProfile:
+      path: "../../test-network/organizations/peerOrganizations/org2.example.com/connection-org2.yaml"
+      discover: true

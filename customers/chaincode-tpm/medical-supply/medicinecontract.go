@@ -79,6 +79,20 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 	return &medicine, nil
 }
 
+// Delete - Function for handling medicine removal. [Regulators]
+func (c *Contract) Delete(ctx TransactionContextInterface, medname string, mednumber string) error {
+	// Retrieve the medicine from the ledger.
+	medicine, err := ctx.GetMedicineList().GetMedicine(medname, mednumber)
+	if err != nil {
+		return err
+	}
+
+	if medicine != nil {
+		return fmt.Errorf("Medicine does not exist, can't delete from ledger.")
+	}
+	return ctx.GetMedicineList().DeleteMedicine(medname, mednumber)
+}
+
 // Request - Function for handling requested medicine. [Customers]
 func (c *Contract) Request(ctx TransactionContextInterface, medname string, mednumber string, customer string) (*MedicalSupply, error) {
 	// Retrieve the medicine from the ledger.

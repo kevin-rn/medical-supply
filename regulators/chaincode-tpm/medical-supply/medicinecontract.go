@@ -15,6 +15,18 @@ func (c *Contract) Instantiate() {
 	fmt.Println("- Contract Instantiated -")
 }
 
+// hasAuthority - Helper function for verifying the invoker organisation.
+func (s *Contract) hasAuthority(ctx TransactionContextInterface) error {
+	ciMsp, err := ctx.GetClientIdentity().GetMSPID()
+	if err != nil {
+		return err
+	}
+	if ciMsp != "Org2MSP" {
+		return fmt.Errorf("user from organisation %s, does not have acces to this function", ciMsp)
+	}
+	return nil
+}
+
 // InitLedger - Adds a base set of medicine (MedicalSupply) to the ledger. [Regulators]
 func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 	// Create array of MedicalSupply objects.
@@ -49,6 +61,11 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 // Issue - Function for handling issued medicine [Regulators]
 func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednumber string,
 	disease string, expiration string, price string) (*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// Create MedicalSupply object.
 	medicine := MedicalSupply{
@@ -71,7 +88,7 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 	medicine.SetAvailable()
 
 	// Add the medicine to the ledger.
-	err := ctx.GetMedicineList().AddMedicine(&medicine)
+	err = ctx.GetMedicineList().AddMedicine(&medicine)
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +98,12 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 
 // Delete - Function for handling medicine removal. [Regulators]
 func (c *Contract) Delete(ctx TransactionContextInterface, medname string, mednumber string) error {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return err
+	}
+
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medname, mednumber)
 	if err != nil {
@@ -88,7 +111,7 @@ func (c *Contract) Delete(ctx TransactionContextInterface, medname string, mednu
 	}
 
 	if medicine != nil {
-		return fmt.Errorf("Medicine does not exist, can't delete from ledger.")
+		return fmt.Errorf("medicine does not exist, can't delete from ledger")
 	}
 	return ctx.GetMedicineList().DeleteMedicine(medname, mednumber)
 }
@@ -103,19 +126,19 @@ func (c *Contract) Request(ctx TransactionContextInterface, medname string, medn
 
 	// Verify that the current holder is MedStore, if that is not the case than the medicine has already been transferred to a different holder.
 	if medicine.Holder != "MedStore" {
-		return nil, fmt.Errorf("Medicine %s:%s has already been bought.", medname, mednumber)
+		return nil, fmt.Errorf("medicine %s:%s has already been bought", medname, mednumber)
 	}
 
 	// Verify that the current state is AVAILABLE, if so set to REQUESTED.
 	if medicine.IsAvailable() {
 		medicine.SetRequested()
 	} else {
-		return nil, fmt.Errorf("Medicine %s:%s is currently not available at MedStore.", medname, mednumber)
+		return nil, fmt.Errorf("medicine %s:%s is currently not available at MedStore", medname, mednumber)
 	}
 
 	// Verify that change to REQUESTED state has succeeded.
 	if !medicine.IsRequested() {
-		return nil, fmt.Errorf("Medicine %s:%s is not requested. current state = %s.", medname, mednumber, medicine.GetState())
+		return nil, fmt.Errorf("medicine %s:%s is not requested. current state = %s", medname, mednumber, medicine.GetState())
 	}
 
 	// Update medicine holder to be the customer instead of MedStore.
@@ -141,7 +164,7 @@ func (c *Contract) CancelRequest(ctx TransactionContextInterface, medName string
 		medicine.SetAvailable()
 		medicine.Holder = "MedStore"
 	} else {
-		return nil, fmt.Errorf("Cannot cancel because medicine has not been requested.")
+		return nil, fmt.Errorf("cannot cancel because medicine has not been requested")
 	}
 
 	// Update medicine on the ledger
@@ -172,6 +195,12 @@ func (c *Contract) SearchMedicineByName(ctx TransactionContextInterface, medName
 
 // CheckHistory - Function for getting an overview of all Medicine. [Regulators]
 func (c *Contract) CheckHistory(ctx TransactionContextInterface) ([]*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Get all medicine from the ledger.
 	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
 	if err != nil {
@@ -200,6 +229,12 @@ func (c *Contract) CheckAvailableMedicine(ctx TransactionContextInterface) ([]*M
 
 // CheckRequestedMedicine - Function for getting an overview of all requested medicine. [Regulators]
 func (c *Contract) CheckRequestedMedicine(ctx TransactionContextInterface) ([]*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Get all medicine from the ledger.
 	medicinelist, err := ctx.GetMedicineList().GetAllMedicine()
 	if err != nil {
@@ -236,6 +271,12 @@ func (c *Contract) CheckUserHistory(ctx TransactionContextInterface, holder stri
 
 // ApproveRequest - Function for handling approving the medicine by changing its state to SEND. [Regulators]
 func (c *Contract) ApproveRequest(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
@@ -246,7 +287,7 @@ func (c *Contract) ApproveRequest(ctx TransactionContextInterface, medName strin
 	if medicine.IsRequested() {
 		medicine.SetSend()
 	} else {
-		return nil, fmt.Errorf("Cannot approve medicine that has not been requested.")
+		return nil, fmt.Errorf("cannot approve medicine that has not been requested")
 	}
 
 	// Update medicine on the ledger
@@ -260,6 +301,12 @@ func (c *Contract) ApproveRequest(ctx TransactionContextInterface, medName strin
 
 // RejectRequest - Function for handling disapproving the medicine by changing its state back to AVAILABLE. [Regulators]
 func (c *Contract) RejectRequest(ctx TransactionContextInterface, medName string, medNumber string) (*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
@@ -271,7 +318,7 @@ func (c *Contract) RejectRequest(ctx TransactionContextInterface, medName string
 		medicine.SetAvailable()
 		medicine.Holder = "MedStore"
 	} else {
-		return nil, fmt.Errorf("Cannot disapprove medicine that has not been requested.")
+		return nil, fmt.Errorf("cannot disapprove medicine that has not been requested")
 	}
 
 	// Update medicine on the ledger
@@ -285,6 +332,12 @@ func (c *Contract) RejectRequest(ctx TransactionContextInterface, medName string
 
 // ChangeStatus - Function for changing the status of a medicine. [Regulators]
 func (c *Contract) ChangeStatus(ctx TransactionContextInterface, medName string, medNumber string, status string) (*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
@@ -300,7 +353,7 @@ func (c *Contract) ChangeStatus(ctx TransactionContextInterface, medName string,
 	case "send":
 		medicine.SetSend()
 	default:
-		return nil, fmt.Errorf("Cannot change status to a non-possible state.")
+		return nil, fmt.Errorf("cannot change status to a non-possible state")
 	}
 
 	// Update medicine on the ledger
@@ -314,6 +367,12 @@ func (c *Contract) ChangeStatus(ctx TransactionContextInterface, medName string,
 
 // ChangeHolder - Function for changing the holder of a medicine. [Regulators]
 func (c *Contract) ChangeHolder(ctx TransactionContextInterface, medName string, medNumber string, customer string) (*MedicalSupply, error) {
+	// Check acces rights
+	err := c.hasAuthority(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Retrieve the medicine from the ledger.
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
@@ -323,7 +382,7 @@ func (c *Contract) ChangeHolder(ctx TransactionContextInterface, medName string,
 	if len(customer) > 0 {
 		medicine.Holder = customer
 	} else {
-		return nil, fmt.Errorf("Can't change current holder to invalid username.")
+		return nil, fmt.Errorf("can't change current holder to invalid username")
 	}
 
 	// Update medicine on the ledger

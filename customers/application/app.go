@@ -181,7 +181,7 @@ func request(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("Request", strings.ToLower(medName), medNumber, appUser)
+	result, err := contract.SubmitTransaction("Request", medName, medNumber, appUser)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}

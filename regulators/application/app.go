@@ -220,7 +220,7 @@ func issue(contract *gateway.Contract, scanner *bufio.Scanner) {
 	price := scanner.Text()
 
 	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
-	result, err := contract.SubmitTransaction("Issue", strings.ToLower(medName), medNumber, disease, expirationDate, price)
+	result, err := contract.SubmitTransaction("Issue", medName, medNumber, disease, expirationDate, price)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}

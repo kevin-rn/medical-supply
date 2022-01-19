@@ -47,6 +47,7 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 	// For each medicine, set it's state to Available, calculate the checksum and update the ledger
 	for _, med := range medicines {
 		med.SetAvailable()
+		// TODO: checksum
 		err := ctx.GetMedicineList().UpdateMedicine(&med)
 
 		if err != nil {
@@ -75,6 +76,13 @@ func (c *Contract) Issue(ctx TransactionContextInterface, medname string, mednum
 		Price:      price,
 		Holder:     "MedStore",
 	}
+
+	// Calculate the checksum by using the hashfunction of the TPM.
+	// checksumError := medicine.InitialiseChecksum()
+	// if checksumError != nil {
+	// 	return nil, fmt.Errorf("Could not issue new MedicalSupply. %s", checksumError)
+	// }
+	medicine.CheckSum = "05010"
 
 	// Set state to AVAILABLE.
 	medicine.SetAvailable()

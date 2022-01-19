@@ -54,9 +54,8 @@ installPackageChaincodeCustomer() {
     # Set global enviroments
     setGlobalsForCustomer
 
-    # Choose the chaincode package to use: with or without the tpm
-    # peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
-    peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode-tpm --label ms_0
+    # Packages chaincode
+    peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ./chaincode --label ms_0
 
     # Install chaincode
     peer lifecycle chaincode install ms-chaincode.tar.gz

@@ -8,6 +8,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -158,10 +160,23 @@ func populateWallet(wallet *gateway.Wallet) error {
 	return wallet.Put(appUser, identity)
 }
 
+// Helper function for pretty printing results to the terminal.
+func prettyPrint(body []byte) {
+	var indentedFormat bytes.Buffer
+	error := json.Indent(&indentedFormat, body, "", "\t")
+	if error != nil {
+		log.Println("Error encountered Json parse error: ", error)
+		// Print bytes normally without the pretty printed format
+		log.Println(string(body))
+		return
+	}
+	log.Println(string(indentedFormat.Bytes()))
+}
+
 // Helper function for printing array results
 func printArray(result []byte) {
 	if len(result) > 0 {
-		log.Println(string(result))
+		prettyPrint(result)
 	} else {
 		log.Println("No transactions found on ledger.")
 	}
@@ -170,11 +185,10 @@ func printArray(result []byte) {
 // Initiliase the ledger with mock data.
 func initLedger(contract *gateway.Contract) {
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
-	result, err := contract.SubmitTransaction("InitLedger")
+	_, err := contract.SubmitTransaction("InitLedger")
 	if err != nil {
 		log.Fatalf("Failed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
 }
 
 // Handling checking the entire transaction history.
@@ -210,7 +224,7 @@ func issue(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Changing status of medicine manually.
@@ -230,7 +244,7 @@ func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Changing holder of medicine manually.
@@ -250,7 +264,7 @@ func changeHolder(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Handling regulators wanting to see all requested medicine matching the medicine name.
@@ -277,7 +291,7 @@ func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Rejecting a medicine (changes its state from REQUESTED to AVAILABLE)
@@ -294,7 +308,7 @@ func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Deletes a medicine
@@ -311,5 +325,5 @@ func delete(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }

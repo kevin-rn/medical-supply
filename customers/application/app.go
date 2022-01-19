@@ -8,6 +8,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -147,10 +149,23 @@ func populateWallet(wallet *gateway.Wallet) error {
 	return wallet.Put(appUser, identity)
 }
 
-// Helper function for printing array results
+// Helper function for pretty printing results to the terminal.
+func prettyPrint(body []byte) {
+	var indentedFormat bytes.Buffer
+	error := json.Indent(&indentedFormat, body, "", "\t")
+	if error != nil {
+		log.Println("Error encountered Json parse error: ", error)
+		// Print bytes normally without the pretty printed format
+		log.Println(string(body))
+		return
+	}
+	log.Println(string(indentedFormat.Bytes()))
+}
+
+// Helper function for printing array results.
 func printArray(result []byte) {
 	if len(result) > 0 {
-		log.Println(string(result))
+		prettyPrint(result)
 	} else {
 		log.Println("No transactions found on ledger.")
 	}
@@ -166,11 +181,11 @@ func request(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("Request", strings.ToLower(medName), medNumber, appUser), 
+	result, err := contract.SubmitTransaction("Request", strings.ToLower(medName), medNumber, appUser)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Invokes function that cancels request for a certain medicine.
@@ -187,7 +202,7 @@ func cancelrequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	log.Println(string(result))
+	prettyPrint(result)
 }
 
 // Invokes function that returns an user's transaction history.
@@ -197,7 +212,7 @@ func checkUserHistory(contract *gateway.Contract) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	printArray(result)
+	prettyPrint(result)
 }
 
 // Invokes function that returns all available medicine matching the medicine name.

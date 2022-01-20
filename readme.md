@@ -6,8 +6,8 @@
 _________________________
 ## Starting and stopping the network:
 Go to ```cd medical-supply```  
-Starting the network: ```./networkDeploy.sh```  
-Stopping the network: ```./networkClean.sh```  
+Starting the network: ```source networkDeploy.sh```  
+Stopping the network: ```source networkClean.sh```  
 
 _________________________
 ## Deploying the chaincode (smart contract):
@@ -51,7 +51,9 @@ To show output from the Docker containers:
 ```./configuration/cli/monitordocker.sh fabric_test``` or alternatively if port number doesn't work: ```./monitordocker.sh fabric_test <port_number>```
 
 ## For Monitoring using Hyperledger Explorer
-1. The test-network first must be run using networkDeploy.sh
+
+![alt](images/explorer.png?raw=true "Hyperledger Explorer")
+1. Start test-network using networkDeploy.sh
 2. Go to explorer folder: ```cd medical-supply/explorer```
 3. Run: ```docker-compose up -d``` to start the Hyperledger Explorer 
 4. Go to ```https://localhost:8080``` for the Hyperledger Explorer.   
@@ -59,4 +61,10 @@ For the login screen:
 username: exploreradmin   
 password: exploreradminpw  
 Note: These can be changed in the ```test-network.json``` file.
-1. Run: ```docker-compose down -v``` to stop the Hyperledger Explorer
+5. Run: ```docker-compose down -v``` to stop the Hyperledger Explorer
+
+## For Running benchmark tests using Hyperledger Caliper
+1. Start test-network using ```source networkDeploy.sh```.
+2. run ```source customersSetup.sh``` and ```source regulatorsSetup.sh``` just like when deploying the chaincode.
+3. run ```npx caliper bind --caliper-bind-sut fabric:2.2``` to bind hyperledger caliper to hyperledger fabric. Note: fabric version 2.3 did not work at the time of this project.
+4. run ```npx caliper launch manager --caliper-fabric-gateway-enabled``` to start running the tests.

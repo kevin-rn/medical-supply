@@ -1,10 +1,9 @@
 package medicalsupply
 
 import (
+	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
-	"log"
 
 	"github.com/google/go-tpm/tpm2"
 	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/customers/chaincode/ledger-api"
@@ -71,76 +70,10 @@ func DeserializeTPM(bytes []byte, auth *TPMAuth) error {
 
 //-------------------------------------------------------//
 
-// var (
-// 	handleNames = map[string][]tpm2.HandleType{
-// 		"all":       []tpm2.HandleType{tpm2.HandleTypeLoadedSession, tpm2.HandleTypeSavedSession, tpm2.HandleTypeTransient},
-// 		"loaded":    []tpm2.HandleType{tpm2.HandleTypeLoadedSession},
-// 		"saved":     []tpm2.HandleType{tpm2.HandleTypeSavedSession},
-// 		"transient": []tpm2.HandleType{tpm2.HandleTypeTransient},
-// 	}
-
-// 	defaultEKTemplate = tpm2.Public{
-// 		Type:    tpm2.AlgRSA,
-// 		NameAlg: tpm2.AlgSHA256,
-// 		Attributes: tpm2.FlagFixedTPM | tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin |
-// 			tpm2.FlagAdminWithPolicy | tpm2.FlagRestricted | tpm2.FlagDecrypt,
-// 		AuthPolicy: []byte{
-// 			0x83, 0x71, 0x97, 0x67, 0x44, 0x84,
-// 			0xB3, 0xF8, 0x1A, 0x90, 0xCC, 0x8D,
-// 			0x46, 0xA5, 0xD7, 0x24, 0xFD, 0x52,
-// 			0xD7, 0x6E, 0x06, 0x52, 0x0B, 0x64,
-// 			0xF2, 0xA1, 0xDA, 0x1B, 0x33, 0x14,
-// 			0x69, 0xAA,
-// 		},
-// 		RSAParameters: &tpm2.RSAParams{
-// 			Symmetric: &tpm2.SymScheme{
-// 				Alg:     tpm2.AlgAES,
-// 				KeyBits: 128,
-// 				Mode:    tpm2.AlgCFB,
-// 			},
-// 			KeyBits:    2048,
-// 			ModulusRaw: make([]byte, 256),
-// 		},
-// 	}
-
-// 	// https://github.com/google/go-tpm/blob/master/tpm2/constants.go#L152
-// 	defaultKeyParams = tpm2.Public{
-// 		Type:    tpm2.AlgRSA,
-// 		NameAlg: tpm2.AlgSHA256,
-// 		Attributes: tpm2.FlagSign | tpm2.FlagRestricted | tpm2.FlagFixedTPM |
-// 			tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin | tpm2.FlagUserWithAuth,
-// 		AuthPolicy: []byte{},
-// 		RSAParameters: &tpm2.RSAParams{
-// 			Sign: &tpm2.SigScheme{
-// 				Alg:  tpm2.AlgRSASSA,
-// 				Hash: tpm2.AlgSHA256,
-// 			},
-// 			KeyBits: 2048,
-// 		},
-// 	}
-
-// 	unrestrictedKeyParams = tpm2.Public{
-// 		Type:    tpm2.AlgRSA,
-// 		NameAlg: tpm2.AlgSHA256,
-// 		Attributes: tpm2.FlagFixedTPM | tpm2.FlagFixedParent | tpm2.FlagSensitiveDataOrigin |
-// 			tpm2.FlagUserWithAuth | tpm2.FlagSign,
-// 		AuthPolicy: []byte{},
-// 		RSAParameters: &tpm2.RSAParams{
-// 			Sign: &tpm2.SigScheme{
-// 				Alg:  tpm2.AlgRSASSA,
-// 				Hash: tpm2.AlgSHA256,
-// 			},
-// 			KeyBits: 2048,
-// 		},
-// 	}
-// )
-
 func tpmHash(input string) (string, error) {
-	tpmPath := flag.String("tpm-path", "/dev/tpm0", "Path to the TPM device (character device or a Unix socket).")
 
 	// Sudo chown kevin /dev/tpm0
-	flag.Parse()
-	rwc, err := tpm2.OpenTPM(*tpmPath)
+	rwc, err := tpm2.OpenTPM("/dev/tpmrm0")
 	if err != nil {
 		return "", err
 	}
@@ -153,8 +86,75 @@ func tpmHash(input string) (string, error) {
 	dataToHash := []byte(input)
 	hashDigest, _, hashErr := tpm2.Hash(rwc, tpm2.AlgSHA256, dataToHash, tpm2.HandleOwner)
 	if hashErr != nil {
-		log.Fatalf("Hash failed unexpectedly: %v", err)
+		return "", fmt.Errorf("hash failed unexpectedly: %s", err)
 	}
 
 	return string(hashDigest[:]), nil
+}
+
+func tpmKey() (string, error) {
+	pcrSelection7 := tpm2.PCRSelection{Hash: tpm2.AlgSHA1, PCRs: []int{7}} // 7 for secure boot
+
+	rwc, err := tpm2.OpenTPM("/dev/tpmrm0")
+	if err != nil {
+		return "", fmt.Errorf("couldn't open the TPM file /dev/tpm0: %s", err)
+	}
+
+	// Generate random 16 bytes
+	randByte, err := tpm2.GetRandom(rwc, 16)
+	if err != nil {
+		return "", fmt.Errorf("generating random bytes for key failed: %s", err)
+	}
+	randompassword := string(randByte)
+	fmt.Println(randompassword)
+
+	// Generate primary key
+	parentHandle, _, err := tpm2.CreatePrimary(rwc, tpm2.HandleOwner, pcrSelection7, "", randompassword, tpm2.Public{
+		Type:       tpm2.AlgRSA,
+		NameAlg:    tpm2.AlgSHA256,
+		Attributes: tpm2.FlagRestricted | tpm2.FlagDecrypt | tpm2.FlagUserWithAuth | tpm2.FlagFixedParent | tpm2.FlagFixedTPM | tpm2.FlagSensitiveDataOrigin,
+		RSAParameters: &tpm2.RSAParams{
+			Symmetric: &tpm2.SymScheme{
+				Alg:     tpm2.AlgAES,
+				KeyBits: 128,
+				Mode:    tpm2.AlgCFB,
+			},
+			KeyBits: 2048,
+		},
+	})
+	if err != nil {
+		return "", fmt.Errorf("CreatePrimary failed: %s", err)
+	}
+	defer tpm2.FlushContext(rwc, parentHandle)
+	privateBlob, publicBlob, _, _, _, err := tpm2.CreateKey(rwc, parentHandle, pcrSelection7, randompassword, randompassword, tpm2.Public{
+		Type:       tpm2.AlgSymCipher,
+		NameAlg:    tpm2.AlgSHA256,
+		Attributes: tpm2.FlagDecrypt | tpm2.FlagSign | tpm2.FlagUserWithAuth | tpm2.FlagFixedParent | tpm2.FlagFixedTPM | tpm2.FlagSensitiveDataOrigin,
+		SymCipherParameters: &tpm2.SymCipherParams{
+			Symmetric: &tpm2.SymScheme{
+				Alg:     tpm2.AlgAES,
+				KeyBits: 128,
+				Mode:    tpm2.AlgCFB,
+			},
+		},
+	})
+	if err != nil {
+		return "", fmt.Errorf("createKey failed: %s", err)
+	}
+	key, _, err := tpm2.Load(rwc, parentHandle, randompassword, publicBlob, privateBlob)
+	if err != nil {
+		return "", fmt.Errorf("loading key failed %s", err)
+	}
+	defer tpm2.FlushContext(rwc, key)
+
+	data := bytes.Repeat([]byte("a"), 1e4) // 10KB
+	iv := make([]byte, 16)                 //16 byte long array
+
+	// Create symmetric encryption key
+	encrypted, err := tpm2.EncryptSymmetric(rwc, randompassword, key, iv, data)
+	if err != nil {
+		return "", fmt.Errorf("creating encryption key failed %s", err)
+	}
+
+	return string(encrypted[:]), nil
 }

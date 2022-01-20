@@ -22,14 +22,8 @@ func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (stri
 
 	_, err := ctx.GetMedicineList().GetTPMAuth(user)
 	if err != nil {
-		isAdmin := c.hasAuthority(ctx) == nil
-
 		// Create MedicalSupply object.
-		tpmAuth := TPMAuth{
-			Holder:  user,
-			TPMKey:  "tpmkey",
-			IsAdmin: isAdmin,
-		}
+		tpmAuth := TPMAuth{Holder: user, TPMKey: "tpmkey"}
 		err = ctx.GetMedicineList().AddTPMAuth(&tpmAuth)
 		if err != nil {
 			return "", err

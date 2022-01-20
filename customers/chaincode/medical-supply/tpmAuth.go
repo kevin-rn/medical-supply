@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/google/go-tpm/tpm2"
-	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/regulators/chaincode/ledger-api"
+	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/customers/chaincode/ledger-api"
 )
 
 // createTPMledgerKey - Creates a key for the TPM Authentication.
@@ -23,11 +23,10 @@ type jsonTPMAuth struct {
 }
 
 type TPMAuth struct {
-	Holder  string `json:"holder"`
-	TPMKey  string `json:"tpmkey"`
-	IsAdmin bool   `json:"isadmin"`
-	class   string `metadata:"class"`
-	key     string `metadata:"key"`
+	Holder string `json:"holder"`
+	TPMKey string `json:"tpmkey"`
+	class  string `metadata:"class"`
+	key    string `metadata:"key"`
 }
 
 //-------------------------------------------------------//

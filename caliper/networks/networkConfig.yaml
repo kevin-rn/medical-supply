@@ -12,17 +12,6 @@ channels:
       - id: medicinecontract
 
 organizations:
-  - mspid: Org1MSP
-    identities:
-      certificates:
-        - name: "alice"
-          clientPrivateKey:
-            path: "../../test-network/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/priv_sk"
-          clientSignedCert:
-            path: "../../test-network/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem"
-    connectionProfile:
-      path: "../../test-network/organizations/peerOrganizations/org1.example.com/connection-org1.yaml"
-      discover: true
   - mspid: Org2MSP
     identities:
       certificates:

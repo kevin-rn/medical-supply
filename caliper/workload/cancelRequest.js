@@ -38,21 +38,21 @@ class MyWorkload extends WorkloadModuleBase {
             const medNumber = `${this.workerIndex}_${i}`;
 
             console.log(`Worker ${this.workerIndex}: Creating asset ${medNumber}`);
-            const request = {
+            const issue = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Issue',
                 invokerIdentity: 'bob',
                 contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10'],
                 readOnly: false
             };
-            await this.sutAdapter.sendRequests(request);
+            await this.sutAdapter.sendRequests(issue);
 
             console.log(`Worker ${this.workerIndex}: request asset ${medNumber}`);
             const request = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Request',
-                invokerIdentity: 'alice',
-                contractArguments: ['Aspirin', medNumber],
+                invokerIdentity: 'bob',
+                contractArguments: ['Aspirin', medNumber, 'bob'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(request);
@@ -65,8 +65,8 @@ class MyWorkload extends WorkloadModuleBase {
         const myArgs = {
             contractId: this.roundArguments.contractId,
             contractFunction: 'CancelRequest',
-            invokerIdentity: 'alice',
-            contractArguments: ['Aspirin', `${this.workerIndex}_${randomId}`],
+            invokerIdentity: 'bob',
+            contractArguments: ['Aspirin', `${this.workerIndex}_${randomId}`, 'bob'],
             readOnly: true
         };
         await this.sutAdapter.sendRequests(myArgs);
@@ -76,14 +76,14 @@ class MyWorkload extends WorkloadModuleBase {
         for (let i = 0; i < this.roundArguments.assets; i++) {
             const medNumber = `${this.workerIndex}_${i}`;
             console.log(`Worker ${this.workerIndex}: Deleting asset ${medNumber}`);
-            const request = {
+            const clean = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Delete',
                 invokerIdentity: 'bob',
                 contractArguments: ['Aspirin', medNumber],
                 readOnly: false
             };
-            await this.sutAdapter.sendRequests(request);
+            await this.sutAdapter.sendRequests(clean);
         }
     }
 

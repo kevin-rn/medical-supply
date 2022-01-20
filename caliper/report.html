@@ -134,8 +134,8 @@
             <ul>
                 <h3>&nbspBenchmark results</h3>
                 <li><a href="#benchmarksummary">Summary</a></li>
-                    <li><a href="#Issue-function">Issue-function</a></li>
-                    <li><a href="#Request-function">Request-function</a></li>
+                    <li><a href="#ApproveRequest-function">ApproveRequest-function</a></li>
+                    <li><a href="#CheckUserHistory-function">CheckUserHistory-function</a></li>
             </ul>
             <ul>
                 <h3>&nbspSystem under test</h3>
@@ -153,47 +153,47 @@
                     </tr>
 
                     <tr>
-                         <td>Issue-function</td> <td>0</td> <td>1000</td> <td>75.7</td> <td>0.00</td> <td>9007199254740.99</td> <td>-</td> <td>75.6</td>
+                         <td>ApproveRequest-function</td> <td>15216</td> <td>0</td> <td>257.8</td> <td>0.14</td> <td>0.01</td> <td>0.02</td> <td>257.8</td>
                     </tr>
                     <tr>
-                         <td>Request-function</td> <td>0</td> <td>15258</td> <td>258.6</td> <td>0.00</td> <td>9007199254740.99</td> <td>-</td> <td>258.5</td>
+                         <td>CheckUserHistory-function</td> <td>189</td> <td>0</td> <td>3.2</td> <td>2.89</td> <td>0.63</td> <td>1.96</td> <td>3.1</td>
                     </tr>
                 </table>
             </div>
-            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="Issue-function">
-                <h2>Benchmark round: Issue-function</h2>
-                <p>Issue asset benchmark</p>
-                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">rateControl:
-  type: linear-rate
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="ApproveRequest-function">
+                <h2>Benchmark round: ApproveRequest-function</h2>
+                <p>Approve Request asset benchmark</p>
+                <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 60
+rateControl:
+  type: fixed-load
   opts:
-    startingTps: 50
-    finishingTps: 200
+    transactionLoad: 5
 </pre>
-                        <h3>Performance metrics for Issue-function</h3>
+                        <h3>Performance metrics for ApproveRequest-function</h3>
                             <table style="min-width: 100%;">
                                 <tr>
                                      <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
                                 </tr>
                                 <tr>
-                                     <td>Issue-function</td> <td>0</td> <td>1000</td> <td>75.7</td> <td>0.00</td> <td>9007199254740.99</td> <td>-</td> <td>75.6</td>
+                                     <td>ApproveRequest-function</td> <td>15216</td> <td>0</td> <td>257.8</td> <td>0.14</td> <td>0.01</td> <td>0.02</td> <td>257.8</td>
                                 </tr>
                             </table>
-                        <h3>Resource utilization for Issue-function</h3>
+                        <h3>Resource utilization for ApproveRequest-function</h3>
                             <h4>Resource monitor: docker</h4>
                             <table style="min-width: 100%;">
                                 <tr>
                                 <table>
                                     <tr>
-                                         <th>Name</th> <th>CPU%(max)</th> <th>CPU%(avg)</th> <th>Memory(max) [MB]</th> <th>Memory(avg) [MB]</th> <th>Traffic In [MB]</th> <th>Traffic Out [MB]</th> <th>Disc Write [B]</th> <th>Disc Read [B]</th>
+                                         <th>Name</th> <th>CPU%(max)</th> <th>CPU%(avg)</th> <th>Memory(max) [MB]</th> <th>Memory(avg) [MB]</th> <th>Traffic In [MB]</th> <th>Traffic Out [MB]</th> <th>Disc Write [KB]</th> <th>Disc Read [B]</th>
                                     </tr>
                                     <tr>
-                                         <td>peer0.org2.example.com</td> <td>34.67</td> <td>15.85</td> <td>71.8</td> <td>62.1</td> <td>2.15</td> <td>2.42</td> <td>0.00</td> <td>0.00</td>
+                                         <td>peer0.org1.example.com</td> <td>3.55</td> <td>1.99</td> <td>116</td> <td>115</td> <td>0.476</td> <td>0.320</td> <td>416</td> <td>0.00</td>
                                     </tr>
                                     <tr>
-                                         <td>peer0.org1.example.com</td> <td>22.05</td> <td>11.74</td> <td>77.6</td> <td>70.8</td> <td>2.15</td> <td>2.51</td> <td>0.00</td> <td>0.00</td>
+                                         <td>peer0.org2.example.com</td> <td>79.18</td> <td>47.65</td> <td>151</td> <td>148</td> <td>43.6</td> <td>67.0</td> <td>416</td> <td>0.00</td>
                                     </tr>
                                     <tr>
-                                         <td>orderer.example.com</td> <td>0.11</td> <td>0.06</td> <td>14.8</td> <td>14.8</td> <td>0.00470</td> <td>0.00451</td> <td>0.00</td> <td>0.00</td>
+                                         <td>orderer.example.com</td> <td>1.34</td> <td>0.31</td> <td>75.8</td> <td>75.0</td> <td>0.270</td> <td>0.519</td> <td>596</td> <td>0.00</td>
                                     </tr>
                                 </table>
                                 </tr>
@@ -202,25 +202,25 @@
                             </div>
             </div>
 
-            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="Request-function">
-                <h2>Benchmark round: Request-function</h2>
-                <p>Request asset benchmark</p>
+            <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;" id="CheckUserHistory-function">
+                <h2>Benchmark round: CheckUserHistory-function</h2>
+                <p>Check User History asset benchmark</p>
                 <pre style="overflow: visible;white-space: pre-wrap;max-height:100%;">txDuration: 60
 rateControl:
   type: fixed-load
   opts:
     transactionLoad: 5
 </pre>
-                        <h3>Performance metrics for Request-function</h3>
+                        <h3>Performance metrics for CheckUserHistory-function</h3>
                             <table style="min-width: 100%;">
                                 <tr>
                                      <th>Name</th> <th>Succ</th> <th>Fail</th> <th>Send Rate (TPS)</th> <th>Max Latency (s)</th> <th>Min Latency (s)</th> <th>Avg Latency (s)</th> <th>Throughput (TPS)</th>
                                 </tr>
                                 <tr>
-                                     <td>Request-function</td> <td>0</td> <td>15258</td> <td>258.6</td> <td>0.00</td> <td>9007199254740.99</td> <td>-</td> <td>258.5</td>
+                                     <td>CheckUserHistory-function</td> <td>189</td> <td>0</td> <td>3.2</td> <td>2.89</td> <td>0.63</td> <td>1.96</td> <td>3.1</td>
                                 </tr>
                             </table>
-                        <h3>Resource utilization for Request-function</h3>
+                        <h3>Resource utilization for CheckUserHistory-function</h3>
             </div>
 
             <div style="border-bottom: 1px solid #d9d9d9; padding-bottom: 10px;">
@@ -232,27 +232,27 @@ workers:
   type: local
   number: 5
 rounds:
-  - label: Issue-function
-    description: Issue asset benchmark
-    txNumber: 1000
-    rateControl:
-      type: linear-rate
-      opts:
-        startingTps: 50
-        finishingTps: 200
-    workload:
-      module: workload&#x2F;issue.js
-      arguments:
-        contractId: medicinecontract
-  - label: Request-function
-    description: Request asset benchmark
+  - label: ApproveRequest-function
+    description: Approve Request asset benchmark
     txDuration: 60
     rateControl:
       type: fixed-load
       opts:
         transactionLoad: 5
     workload:
-      module: workload&#x2F;request.js
+      module: workload&#x2F;approveRequest.js
+      arguments:
+        assets: 10
+        contractId: medicinecontract
+  - label: CheckUserHistory-function
+    description: Check User History asset benchmark
+    txDuration: 60
+    rateControl:
+      type: fixed-load
+      opts:
+        transactionLoad: 5
+    workload:
+      module: workload&#x2F;checkUserHistory.js
       arguments:
         assets: 10
         contractId: medicinecontract

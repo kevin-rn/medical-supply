@@ -38,14 +38,14 @@ class MyWorkload extends WorkloadModuleBase {
             const medNumber = `${this.workerIndex}_${i}`;
 
             console.log(`Worker ${this.workerIndex}: Creating asset ${medNumber}`);
-            const request = {
+            const issue = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Issue',
                 invokerIdentity: 'bob',
                 contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10'],
                 readOnly: false
             };
-            await this.sutAdapter.sendRequests(request);
+            await this.sutAdapter.sendRequests(issue);
         }
     
     }

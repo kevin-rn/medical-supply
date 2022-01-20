@@ -38,14 +38,14 @@ class MyWorkload extends WorkloadModuleBase {
             const medNumber = `${this.workerIndex}_${i}`;
 
             console.log(`Worker ${this.workerIndex}: Creating asset ${medNumber}`);
-            const request = {
+            const issue = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Issue',
                 invokerIdentity: 'bob',
                 contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10'],
                 readOnly: false
             };
-            await this.sutAdapter.sendRequests(request);
+            await this.sutAdapter.sendRequests(issue);
         }
     
     }
@@ -66,14 +66,14 @@ class MyWorkload extends WorkloadModuleBase {
         for (let i = 0; i < this.roundArguments.assets; i++) {
             const medNumber = `${this.workerIndex}_${i}`;
             console.log(`Worker ${this.workerIndex}: Deleting asset ${medNumber}`);
-            const request = {
+            const clean = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Delete',
                 invokerIdentity: 'bob',
                 contractArguments: ['Aspirin', medNumber],
                 readOnly: false
             };
-            await this.sutAdapter.sendRequests(request);
+            await this.sutAdapter.sendRequests(clean);
         }
     }
 

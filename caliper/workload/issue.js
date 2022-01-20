@@ -34,15 +34,15 @@ class MyWorkload extends WorkloadModuleBase {
 
         let price = Math.floor(Math.random() * 100).toString() // random number between 0 and 100
 
-        const request = {
+        const issue = {
             contractId: this.roundArguments.contractId,
             contractFunction: 'Issue',
-            invokerIdentity: 'alice',
+            invokerIdentity: 'bob',
             contractArguments: [medName, medNumber, disease, date, price],
             readOnly: false
         };
 
-        await this.sutAdapter.sendRequests(request);
+        await this.sutAdapter.sendRequests(issue);
     }
 
 }

@@ -132,7 +132,7 @@ func (c *Contract) Delete(ctx TransactionContextInterface, medName string, medNu
 		return err
 	}
 
-	if medicine != nil {
+	if medicine == nil {
 		return fmt.Errorf("medicine does not exist, can't delete from ledger")
 	}
 	return ctx.GetMedicineList().DeleteMedicine(medName, medNumber)

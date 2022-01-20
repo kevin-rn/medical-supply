@@ -64,7 +64,9 @@ Note: These can be changed in the ```test-network.json``` file.
 5. Run: ```docker-compose down -v``` to stop the Hyperledger Explorer
 
 ## For Running benchmark tests using Hyperledger Caliper
-1. Start test-network using ```source networkDeploy.sh```.
-2. run ```source customersSetup.sh``` and ```source regulatorsSetup.sh``` just like when deploying the chaincode.
-3. run ```npx caliper bind --caliper-bind-sut fabric:2.2``` to bind hyperledger caliper to hyperledger fabric. Note: fabric version 2.3 did not work at the time of this project.
-4. run ```npx caliper launch manager --caliper-fabric-gateway-enabled``` to start running the tests.
+![alt](images/caliper.png?raw=true "Hyperledger Caliper")
+1. Install npm and run ```npm install``` inside caliper folder
+2. Start test-network using ```source networkDeploy.sh```.
+3. run ```source customersSetup.sh``` and ```source regulatorsSetup.sh``` just like when deploying the chaincode.
+4. run ```npx caliper bind --caliper-bind-sut fabric:2.2``` to bind hyperledger caliper to hyperledger fabric. Note: fabric version 2.3 did not work at the time of this project.
+5. run ```npx caliper launch manager --caliper-fabric-gateway-enabled``` to start running the tests.

@@ -245,7 +245,7 @@ func checkUserHistory(contract *gateway.Contract) {
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
-	prettyPrint(result)
+	printArray(result)
 }
 
 // Invokes function that returns all available medicine matching the medicine name.

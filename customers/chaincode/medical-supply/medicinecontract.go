@@ -30,7 +30,7 @@ func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (stri
 		}
 		return tpmAuth.TPMKey, nil
 	}
-	return "", fmt.Errorf("User %s has already created a TPM authentication", user)
+	return "", fmt.Errorf("user %s has already created a TPM authentication", user)
 }
 
 // hasAuthority - Helper function for verifying the invoker organisation.
@@ -69,7 +69,7 @@ func (s *Contract) InitLedger(ctx TransactionContextInterface) error {
 		err := ctx.GetMedicineList().UpdateMedicine(&med)
 
 		if err != nil {
-			return fmt.Errorf("Failed to put to world state. %s", err.Error())
+			return fmt.Errorf("failed to put to world state. %s", err.Error())
 		}
 	}
 

@@ -105,7 +105,7 @@ func TestDeserialize(t *testing.T) {
 
 	medicine = new(MedicalSupply)
 	correctJson := `{"medName":"aspirin","medNumber":"00001","disease":"pain","expiration":"2022.02.22","price":"$10","holder":"alice","currentState":1,"class":"org.medstore.medicalsupply","key":"MedStore:aspirin:00001"}`
-	err = Deserialize([]byte(correctJson), medicine)
+	err = DeserializeJSON([]byte(correctJson), medicine)
 	assert.Nil(t, err, "should not return error for deserialize")
 
 	expectedMedicine := new(MedicalSupply)
@@ -120,6 +120,6 @@ func TestDeserialize(t *testing.T) {
 
 	incorrectJson := `{"medName":"aspirin","medNumber":"00001","disease": 404,"expiration":"2022.02.22","price":"$10","holder":"alice","currentState":1,"class":"org.medstore.medicalsupply","key":"MedStore:aspirin:00001"}`
 	medicine = new(MedicalSupply)
-	err = Deserialize([]byte(incorrectJson), medicine)
+	err = DeserializeJSON([]byte(incorrectJson), medicine)
 	assert.EqualError(t, err, "Error deserializing medical supply. json: cannot unmarshal number into Go struct field jsonMedicalSupply.disease of type string", "should return error for bad data")
 }

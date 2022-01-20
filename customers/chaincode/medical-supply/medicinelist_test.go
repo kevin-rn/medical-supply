@@ -21,7 +21,7 @@ func TestNewStateList(t *testing.T) {
 	assert.Equal(t, ctx, stateList.Ctx, "should set the context to passed context")
 	assert.Equal(t, "org.medstore.medicalsupplylist", stateList.Name, "should set the name for the list")
 
-	expectedErr := Deserialize([]byte("bad json"), new(MedicalSupply))
-	err := stateList.Deserialize([]byte("bad json"), new(MedicalSupply))
+	expectedErr := DeserializeJSON([]byte("bad json"), new(MedicalSupply))
+	err := stateList.DeserializeJSON([]byte("bad json"), new(MedicalSupply))
 	assert.EqualError(t, err, expectedErr.Error(), "should call Deserialize when stateList.Deserialize called")
 }

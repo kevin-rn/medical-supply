@@ -22,6 +22,7 @@ DIR=${PWD}
 cleanUpCredentials() {
     rm -rf "${DIR}/application/keystore"
     rm -rf "${DIR}/application/wallet"
+    rm -rf "${DIR}/application/tpmkey.txt"
 }
 
 # Sets certain environment variables in command window (administrator) in order to use the correct set of peer binaries, 

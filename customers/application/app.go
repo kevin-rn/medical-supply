@@ -34,6 +34,12 @@ func main() {
 	wallet := enrollUser()
 	contract := connectToNetwork(wallet)
 
+	tpmkey, err := tpmKeyHandler(contract, "tpmkey.txt")
+	if err != nil {
+		log.Fatalf("Failed to generate TPM key: %v", err)
+	}
+	log.Printf("TPM Key used is: %v", tpmkey)
+
 	log.Println("Choose number to invoke function: \n" +
 		"1 - Request a medicine \n" +
 		"2 - Cancel request \n" +
@@ -147,6 +153,39 @@ func populateWallet(wallet *gateway.Wallet) error {
 	identity := gateway.NewX509Identity(mspID, string(cert), string(key))
 
 	return wallet.Put(appUser, identity)
+}
+
+// Reads tpm key from file, if no success then request for new key and store that.
+func tpmKeyHandler(contract *gateway.Contract, filepath string) (string, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		// Request tpm key from smart contract
+		log.Println("--> Submit Transaction: TPMKeyGen, function requests for tpm generated key.")
+		result, err := contract.SubmitTransaction("TPMKeyGen", appUser)
+		if err != nil {
+			log.Fatalf("\nFailed to Submit transaction: %v", err)
+		}
+		tpmkey := string(result)
+
+		// Store tpmkey to file
+		file, err := os.Create(filepath)
+		if err != nil {
+			return tpmkey, err
+		}
+		defer file.Close()
+
+		w := bufio.NewWriter(file)
+		fmt.Fprintln(w, tpmkey)
+		return tpmkey, w.Flush()
+
+	} else {
+		// Read key from file
+		defer file.Close()
+		scanner := bufio.NewScanner(file)
+		scanner.Scan()
+		line := scanner.Text()
+		return line, scanner.Err()
+	}
 }
 
 // Helper function for pretty printing results to the terminal.

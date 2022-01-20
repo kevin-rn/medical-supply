@@ -14,7 +14,7 @@ import (
 // StateListInterface functions that a state list should have.
 type StateListInterface interface {
 	AddState(StateInterface) error
-	GetState(string, StateInterface) error
+	GetState(string, StateInterface, string) error
 	GetAllStatesByPartialKey(string) (shim.StateQueryIteratorInterface, error)
 	GetAllStates() (shim.StateQueryIteratorInterface, error)
 	UpdateState(StateInterface) error
@@ -24,9 +24,10 @@ type StateListInterface interface {
 // StateList useful for managing putting data in and out of the ledger.
 // Implementation of StateListInterface.
 type StateList struct {
-	Ctx         contractapi.TransactionContextInterface
-	Name        string
-	Deserialize func([]byte, StateInterface) error
+	Ctx             contractapi.TransactionContextInterface
+	Name            string
+	DeserializeJSON func([]byte, StateInterface) error
+	DeserializeTPM  func([]byte, StateInterface) error
 }
 
 // AddState - Puts state into world state.
@@ -44,7 +45,7 @@ func (sl *StateList) AddState(state StateInterface) error {
 // GetState - Returns state from world state.
 // Unmarshalls the JSON into passed state.
 // Key is the split key value used in Add/Update joined using a colon
-func (sl *StateList) GetState(key string, state StateInterface) error {
+func (sl *StateList) GetState(key string, state StateInterface, objecttype string) error {
 	ledgerKey, _ := sl.Ctx.GetStub().CreateCompositeKey(sl.Name, SplitKey(key))
 	data, err := sl.Ctx.GetStub().GetState(ledgerKey)
 
@@ -53,8 +54,10 @@ func (sl *StateList) GetState(key string, state StateInterface) error {
 	} else if data == nil {
 		return fmt.Errorf("No state found for %s", key)
 	}
-
-	return sl.Deserialize(data, state)
+	if objecttype == "tpmauth" {
+		return sl.DeserializeTPM(data, state)
+	}
+	return sl.DeserializeJSON(data, state)
 }
 
 // GetAllStates - Returns all states matching the partial key from world state.

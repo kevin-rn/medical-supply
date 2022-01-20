@@ -14,6 +14,8 @@ type ListInterface interface {
 	GetAllMedicine() ([]*MedicalSupply, error)
 	UpdateMedicine(*MedicalSupply) error
 	DeleteMedicine(string, string) error
+	AddTPMAuth(*TPMAuth) error
+	GetTPMAuth(string) (*TPMAuth, error)
 }
 
 type list struct {
@@ -30,7 +32,7 @@ func (msl *list) GetMedicine(medName string, medNumber string) (*MedicalSupply, 
 	ms := new(MedicalSupply)
 
 	// Use composite key to retrieve the medicine.
-	err := msl.statelist.GetState(CreateMedicalKey(medName, medNumber), ms)
+	err := msl.statelist.GetState(CreateMedicalKey(medName, medNumber), ms, "medicalsupply")
 	if err != nil {
 		return nil, err
 	}
@@ -102,15 +104,38 @@ func (msl *list) DeleteMedicine(medName string, medNumber string) error {
 	return msl.statelist.DeleteState(CreateMedicalKey(medName, medNumber))
 }
 
+//-------------------------------------------------------//
+
+// AddTPMAuth - Add tpm authentication to the ledger.
+func (msl *list) AddTPMAuth(auth *TPMAuth) error {
+	return msl.statelist.AddState(auth)
+}
+
+// GetTPMAuth - Retrieve tpm authentication from the ledger.
+func (msl *list) GetTPMAuth(holder string) (*TPMAuth, error) {
+	auth := new(TPMAuth)
+
+	// Use composite key to retrieve the medicine.
+	err := msl.statelist.GetState(createTPMledgerKey(holder), auth, "tpmauth")
+	if err != nil {
+		return nil, err
+	}
+	return auth, nil
+}
+
+//-------------------------------------------------------//
+
 // newList - Create new statelist.
 func newList(ctx TransactionContextInterface) *list {
 	statelist := new(ledgerapi.StateList)
 	statelist.Ctx = ctx
 	statelist.Name = "org.medstore.medicalsupplylist"
-	statelist.Deserialize = func(bytes []byte, state ledgerapi.StateInterface) error {
-		return Deserialize(bytes, state.(*MedicalSupply))
+	statelist.DeserializeJSON = func(bytes []byte, state ledgerapi.StateInterface) error {
+		return DeserializeJSON(bytes, state.(*MedicalSupply))
 	}
-
+	statelist.DeserializeTPM = func(bytes []byte, state ledgerapi.StateInterface) error {
+		return DeserializeTPM(bytes, state.(*TPMAuth))
+	}
 	list := new(list)
 	list.statelist = statelist
 	return list

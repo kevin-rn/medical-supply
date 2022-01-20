@@ -1,11 +1,76 @@
 package medicalsupply
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/google/go-tpm/tpm2"
+	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/customers/chaincode/ledger-api"
 )
+
+// createTPMledgerKey - Creates a key for the TPM Authentication.
+func createTPMledgerKey(holder string) string {
+	return ledgerapi.MakeKey("TPMAUTH", holder)
+}
+
+type tpmAuthAlias TPMAuth
+type jsonTPMAuth struct {
+	*tpmAuthAlias
+	Class string `json:"class"`
+	Key   string `json:"key"`
+}
+
+type TPMAuth struct {
+	Holder  string `json:"holder"`
+	TPMKey  string `json:"tpmkey"`
+	IsAdmin bool   `json:"isadmin"`
+	class   string `metadata:"class"`
+	key     string `metadata:"key"`
+}
+
+//-------------------------------------------------------//
+
+// MarshalJSON - Special handler for managing JSON marshalling.
+func (auth TPMAuth) MarshalJSON() ([]byte, error) {
+	jauth := jsonTPMAuth{tpmAuthAlias: (*tpmAuthAlias)(&auth), Class: "org.medstore.tpmauth", Key: createTPMledgerKey(auth.Holder)}
+	return json.Marshal(&jauth)
+}
+
+// UnmarshalJSON - Special handler for managing JSON marshalling.
+func (auth *TPMAuth) UnmarshalJSON(data []byte) error {
+	jauth := jsonTPMAuth{tpmAuthAlias: (*tpmAuthAlias)(auth)}
+
+	err := json.Unmarshal(data, &jauth)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetSplitKey - Returns values which should be used to form key.
+func (auth *TPMAuth) GetSplitKey() []string {
+	return []string{"TPMAUTH", auth.Holder}
+}
+
+// Serialize - Formats the tpm authentication as JSON bytes.
+func (auth *TPMAuth) Serialize() ([]byte, error) {
+	return json.Marshal(auth)
+}
+
+// Deserialize - Formats the tpm authentication from JSON bytes.
+func DeserializeTPM(bytes []byte, auth *TPMAuth) error {
+	err := json.Unmarshal(bytes, auth)
+
+	if err != nil {
+		return fmt.Errorf("Error deserializing tpm authentication. %s", err.Error())
+	}
+
+	return nil
+}
+
+//-------------------------------------------------------//
 
 var (
 	handleNames = map[string][]tpm2.HandleType{

@@ -60,9 +60,9 @@ type MedicalSupply struct {
 
 // MarshalJSON - Special handler for managing JSON marshalling.
 func (ms MedicalSupply) MarshalJSON() ([]byte, error) {
-	jcp := jsonMedicalSupply{medicalSupplyAlias: (*medicalSupplyAlias)(&ms), State: ms.state, Class: "org.medstore.medicalsupply", Key: ledgerapi.MakeKey("MedStore", ms.MedName, ms.MedNumber)}
+	jms := jsonMedicalSupply{medicalSupplyAlias: (*medicalSupplyAlias)(&ms), State: ms.state, Class: "org.medstore.medicalsupply", Key: CreateMedicalKey(ms.MedName, ms.MedNumber)}
 
-	return json.Marshal(&jcp)
+	return json.Marshal(&jms)
 }
 
 // UnmarshalJSON - Special handler for managing JSON marshalling.
@@ -154,7 +154,7 @@ func (ms *MedicalSupply) Serialize() ([]byte, error) {
 }
 
 // Deserialize - Formats the commercial paper from JSON bytes.
-func Deserialize(bytes []byte, ms *MedicalSupply) error {
+func DeserializeJSON(bytes []byte, ms *MedicalSupply) error {
 	err := json.Unmarshal(bytes, ms)
 
 	if err != nil {

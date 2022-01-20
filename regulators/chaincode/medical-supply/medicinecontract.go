@@ -15,6 +15,30 @@ func (c *Contract) Instantiate() {
 	fmt.Println("- Contract Instantiated -")
 }
 
+// TPMKeyGen - Helper function for generating tpm key to be used for authentication.
+// Only returns key at first creation as calling this function repeatedly would otherwise be exploitable.
+func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (string, error) {
+	//TODO: Hash user string
+
+	_, err := ctx.GetMedicineList().GetTPMAuth(user)
+	if err != nil {
+		isAdmin := c.hasAuthority(ctx) == nil
+
+		// Create MedicalSupply object.
+		tpmAuth := TPMAuth{
+			Holder:  user,
+			TPMKey:  "tpmkey",
+			IsAdmin: isAdmin,
+		}
+		err = ctx.GetMedicineList().AddTPMAuth(&tpmAuth)
+		if err != nil {
+			return "", err
+		}
+		return tpmAuth.TPMKey, nil
+	}
+	return "", fmt.Errorf("User %s has already created a TPM authentication", user)
+}
+
 // hasAuthority - Helper function for verifying the invoker organisation.
 func (s *Contract) hasAuthority(ctx TransactionContextInterface) error {
 	ciMsp, err := ctx.GetClientIdentity().GetMSPID()

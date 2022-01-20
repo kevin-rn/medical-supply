@@ -15,7 +15,7 @@ type ListInterface interface {
 	UpdateMedicine(*MedicalSupply) error
 	DeleteMedicine(string, string) error
 	AddTPMAuth(*TPMAuth) error
-	GetTPMAuth(string) (*TPMAuth, error)
+	VerifyTPMAuth(string) bool
 }
 
 type list struct {
@@ -112,15 +112,12 @@ func (msl *list) AddTPMAuth(auth *TPMAuth) error {
 }
 
 // GetTPMAuth - Retrieve tpm authentication from the ledger.
-func (msl *list) GetTPMAuth(holder string) (*TPMAuth, error) {
+func (msl *list) VerifyTPMAuth(holder string) bool {
 	auth := new(TPMAuth)
 
 	// Use composite key to retrieve the medicine.
 	err := msl.statelist.GetState(createTPMledgerKey(holder), auth, "tpmauth")
-	if err != nil {
-		return nil, err
-	}
-	return auth, nil
+	return err != nil
 }
 
 //-------------------------------------------------------//

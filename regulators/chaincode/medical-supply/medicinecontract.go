@@ -20,15 +20,11 @@ func (c *Contract) Instantiate() {
 func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (string, error) {
 	//TODO: Hash user string
 
-	_, err := ctx.GetMedicineList().GetTPMAuth(user)
-	if err != nil {
+	bool := ctx.GetMedicineList().VerifyTPMAuth(user)
+	if bool {
 		// Create MedicalSupply object.
-		tpmAuth := TPMAuth{
-			Holder:  user,
-			TPMKey:  "tpmkey",
-			IsAdmin: isAdmin,
-		}
-		err = ctx.GetMedicineList().AddTPMAuth(&tpmAuth)
+		tpmAuth := TPMAuth{Holder: user, TPMKey: "tpmkey"}
+		err := ctx.GetMedicineList().AddTPMAuth(&tpmAuth)
 		if err != nil {
 			return "", err
 		}

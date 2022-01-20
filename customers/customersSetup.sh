@@ -1,6 +1,5 @@
 #!/bin/bash
-#
-# SPDX-License-Identifier: Apache-2.0
+
 TMPFILE=`mktemp`
 shopt -s extglob
 

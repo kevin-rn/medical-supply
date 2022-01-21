@@ -78,3 +78,5 @@ run: sudo chmod 666 /var/run/docker.sock
 
 problem: permission denied to /dev/tpm0 or /dev/tpmrm0
 run: sudo chown <username> /dev/tpm0
+
+replace - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock in 

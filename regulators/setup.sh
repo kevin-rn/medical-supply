@@ -60,7 +60,7 @@ installPackageChaincodeRegulator() {
 
     # Install chaincode
     peer lifecycle chaincode install ms-chaincode.tar.gz
-    echo "===================== Chaincode is packaged on Customer ===================== "
+    echo "===================== Chaincode is packaged on Regulator ===================== "
 }
 
 # Query the installed chaincode to get the package_id and sets it as an environmental variable.
@@ -68,7 +68,7 @@ queryInstalled() {
     peer lifecycle chaincode queryinstalled >&log.txt
     cat log.txt
     PACKAGE_ID=$(sed -n "/${CC_NAME_1}_${VERSION_1}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
-    echo "===================== Query installed successful on Customer on channel ===================== "
+    echo "===================== Query installed successful on Regulator on channel ===================== "
 }
 
 # Approve chaincode for the organisation.

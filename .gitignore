@@ -18,3 +18,5 @@ regulators/application/wallet
 regulators/application/tpmkey.txt
 regulators/application/vendor/
 regulators/chaincode/vendor/
+
+external-chaincode/vendor

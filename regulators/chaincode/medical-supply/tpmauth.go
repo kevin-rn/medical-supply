@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/google/go-tpm/tpm2"
 	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/regulators/chaincode/ledger-api"
@@ -62,7 +63,7 @@ func DeserializeTPM(bytes []byte, auth *TPMAuth) error {
 	err := json.Unmarshal(bytes, auth)
 
 	if err != nil {
-		return fmt.Errorf("Error deserializing tpm authentication. %s", err.Error())
+		return fmt.Errorf("error deserializing tpm authentication. %s", err.Error())
 	}
 
 	return nil
@@ -72,6 +73,7 @@ func DeserializeTPM(bytes []byte, auth *TPMAuth) error {
 
 // tpmHash - Hashes string using TPM 2.0.
 func tpmHash(input string) (string, error) {
+	input = strings.ToLower(input)
 
 	// Sudo chown krn /dev/tpm0
 	rwc, err := tpm2.OpenTPM("/dev/tpmrm0")

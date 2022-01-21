@@ -51,23 +51,23 @@ func main() {
 
 	switch strings.ToLower(input) {
 	case "1":
-		initLedger(contract)
+		initLedger(contract, tpmkey)
 	case "2":
-		checkHistory(contract)
+		checkHistory(contract, tpmkey)
 	case "3":
-		issue(contract, scanner)
+		issue(contract, scanner, tpmkey)
 	case "4":
-		changeStatusMedicine(contract, scanner)
+		changeStatusMedicine(contract, scanner, tpmkey)
 	case "5":
-		changeHolder(contract, scanner)
+		changeHolder(contract, scanner, tpmkey)
 	case "6":
-		checkRequestedMedicine(contract)
+		checkRequestedMedicine(contract, tpmkey)
 	case "7":
-		approveRequest(contract, scanner)
+		approveRequest(contract, scanner, tpmkey)
 	case "8":
-		rejectRequest(contract, scanner)
+		rejectRequest(contract, scanner, tpmkey)
 	case "9":
-		delete(contract, scanner)
+		delete(contract, scanner, tpmkey)
 	default:
 		log.Fatalf("\n Error: Function to invoke not found.")
 	}
@@ -203,7 +203,7 @@ func prettyPrint(body []byte) {
 		log.Println(string(body))
 		return
 	}
-	log.Println(string(indentedFormat.Bytes()))
+	log.Println(indentedFormat.String())
 }
 
 // Helper function for printing array results
@@ -216,18 +216,18 @@ func printArray(result []byte) {
 }
 
 // Initiliase the ledger with mock data.
-func initLedger(contract *gateway.Contract) {
+func initLedger(contract *gateway.Contract, tpmkey string) {
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of medical supply on the ledger")
-	_, err := contract.SubmitTransaction("InitLedger")
+	_, err := contract.SubmitTransaction("InitLedger", appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("Failed to Submit transaction: %v", err)
 	}
 }
 
 // Handling checking the entire transaction history.
-func checkHistory(contract *gateway.Contract) {
+func checkHistory(contract *gateway.Contract, tpmkey string) {
 	log.Println("--> Submit Transaction: CheckHistory, function shows history.")
-	result, err := contract.SubmitTransaction("CheckHistory")
+	result, err := contract.SubmitTransaction("CheckHistory", appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -235,7 +235,7 @@ func checkHistory(contract *gateway.Contract) {
 }
 
 // Handling when regulators issue a new medicine (add to the ledger).
-func issue(contract *gateway.Contract, scanner *bufio.Scanner) {
+func issue(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -253,7 +253,7 @@ func issue(contract *gateway.Contract, scanner *bufio.Scanner) {
 	price := scanner.Text()
 
 	log.Println("--> Submit Transaction: Issue, function sends issue for medicine.")
-	result, err := contract.SubmitTransaction("Issue", medName, medNumber, disease, expirationDate, price)
+	result, err := contract.SubmitTransaction("Issue", medName, medNumber, disease, expirationDate, price, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -261,7 +261,7 @@ func issue(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Changing status of medicine manually.
-func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner) {
+func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -273,7 +273,7 @@ func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner) {
 	status := scanner.Text()
 
 	log.Println("--> Submit Transaction: ChangeStatusMedicine, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("ChangeStatusMedicine", medName, medNumber, status)
+	result, err := contract.SubmitTransaction("ChangeStatusMedicine", medName, medNumber, status, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -281,7 +281,7 @@ func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Changing holder of medicine manually.
-func changeHolder(contract *gateway.Contract, scanner *bufio.Scanner) {
+func changeHolder(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -293,7 +293,7 @@ func changeHolder(contract *gateway.Contract, scanner *bufio.Scanner) {
 	holder := scanner.Text()
 
 	log.Println("--> Submit Transaction: ChangeHolder, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("ChangeHolder", medName, medNumber, holder)
+	result, err := contract.SubmitTransaction("ChangeHolder", medName, medNumber, holder, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -301,9 +301,9 @@ func changeHolder(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Handling regulators wanting to see all requested medicine matching the medicine name.
-func checkRequestedMedicine(contract *gateway.Contract) {
+func checkRequestedMedicine(contract *gateway.Contract, tpmkey string) {
 	log.Println("--> Submit Transaction: CheckRequestedMedicine, function shows all requested medicine.")
-	result, err := contract.SubmitTransaction("CheckRequestedMedicine")
+	result, err := contract.SubmitTransaction("CheckRequestedMedicine", appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -311,7 +311,7 @@ func checkRequestedMedicine(contract *gateway.Contract) {
 }
 
 // Approves a medicine (changes its state from REQUESTED to SEND)
-func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
+func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -320,7 +320,7 @@ func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: ApproveRequest, function that approves medicine.")
-	result, err := contract.SubmitTransaction("ApproveRequest", medName, medNumber)
+	result, err := contract.SubmitTransaction("ApproveRequest", medName, medNumber, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -328,7 +328,7 @@ func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Rejecting a medicine (changes its state from REQUESTED to AVAILABLE)
-func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
+func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -337,7 +337,7 @@ func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: RejectRequest, function that approves medicine.")
-	result, err := contract.SubmitTransaction("RejectRequest", medName, medNumber)
+	result, err := contract.SubmitTransaction("RejectRequest", medName, medNumber, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -345,7 +345,7 @@ func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Deletes a medicine
-func delete(contract *gateway.Contract, scanner *bufio.Scanner) {
+func delete(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -354,7 +354,7 @@ func delete(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: Delete, function that approves medicine.")
-	result, err := contract.SubmitTransaction("Delete", medName, medNumber)
+	result, err := contract.SubmitTransaction("Delete", medName, medNumber, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}

@@ -47,5 +47,5 @@ func TestDeserializeTPM(t *testing.T) {
 	incorrectJson := `{"holder":10, "key":"hashedkey", "class":"org.medstore.tpmauth","key":"TPMAUTH:hashedusername"}`
 	auth = new(TPMAuth)
 	err = DeserializeTPM([]byte(incorrectJson), auth)
-	assert.EqualError(t, err, "Error deserializing tpm authentication. json: cannot unmarshal number into Go struct field jsonTPMAuth.holder of type string", "should return error for bad data")
+	assert.EqualError(t, err, "error deserializing tpm authentication. json: cannot unmarshal number into Go struct field jsonTPMAuth.holder of type string", "should return error for bad data")
 }

@@ -2,6 +2,7 @@ package medicalsupply
 
 import (
 	"encoding/json"
+	"strings"
 
 	ledgerapi "github.com/hyperledger/fabric-samples/medical-supply/customers/chaincode/ledger-api"
 )
@@ -15,7 +16,8 @@ type ListInterface interface {
 	UpdateMedicine(*MedicalSupply) error
 	DeleteMedicine(string, string) error
 	AddTPMAuth(*TPMAuth) error
-	VerifyTPMAuth(string) bool
+	ExistsTPMAuth(string) bool
+	VerifyTPMAuth(string, string) (bool, error)
 }
 
 type list struct {
@@ -31,6 +33,9 @@ func (msl *list) AddMedicine(medicine *MedicalSupply) error {
 func (msl *list) GetMedicine(medName string, medNumber string) (*MedicalSupply, error) {
 	ms := new(MedicalSupply)
 
+	// Set to lower case
+	medName = strings.ToLower(medName)
+
 	// Use composite key to retrieve the medicine.
 	err := msl.statelist.GetState(CreateMedicalKey(medName, medNumber), ms, "medicalsupply")
 	if err != nil {
@@ -41,6 +46,9 @@ func (msl *list) GetMedicine(medName string, medNumber string) (*MedicalSupply, 
 
 // GetAllMedicineByName - Retrieves all medicine matching the medicine name from the statelist.
 func (msl *list) GetAllMedicineByName(medName string) ([]*MedicalSupply, error) {
+	// Set to lower case
+	medName = strings.ToLower(medName)
+
 	// GetAllStatesByPartialKey returns an iterator
 	data, err := msl.statelist.GetAllStatesByPartialKey(medName)
 	if err != nil {
@@ -101,6 +109,8 @@ func (msl *list) UpdateMedicine(medicine *MedicalSupply) error {
 
 // GetMedicine - Retrieves medicine from the statelist.
 func (msl *list) DeleteMedicine(medName string, medNumber string) error {
+	// Set to lower case
+	medName = strings.ToLower(medName)
 	return msl.statelist.DeleteState(CreateMedicalKey(medName, medNumber))
 }
 
@@ -111,13 +121,26 @@ func (msl *list) AddTPMAuth(auth *TPMAuth) error {
 	return msl.statelist.AddState(auth)
 }
 
-// GetTPMAuth - Retrieve tpm authentication from the ledger.
-func (msl *list) VerifyTPMAuth(holder string) bool {
+// GetTPMAuth - Check if TPM auth exists on the ledger.
+func (msl *list) ExistsTPMAuth(holder string) bool {
 	auth := new(TPMAuth)
 
 	// Use composite key to retrieve the medicine.
 	err := msl.statelist.GetState(createTPMledgerKey(holder), auth, "tpmauth")
 	return err != nil
+}
+
+// VerifyTPMAuth - Check if TPM auth exists and verify the provided tpm key matches.
+func (msl *list) VerifyTPMAuth(holder string, tpmkey string) (bool, error) {
+	auth := new(TPMAuth)
+	// Use composite key to retrieve the medicine.
+	err := msl.statelist.GetState(createTPMledgerKey(holder), auth, "tpmauth")
+	if err != nil {
+		return false, err
+	}
+	// Verify if tpm key matches
+	check := auth.TPMKey == tpmkey
+	return check, nil
 }
 
 //-------------------------------------------------------//

@@ -47,11 +47,11 @@ func main() {
 
 	switch strings.ToLower(input) {
 	case "1":
-		request(contract, scanner)
+		request(contract, scanner, tpmkey)
 	case "2":
-		cancelrequest(contract, scanner)
+		cancelrequest(contract, scanner, tpmkey)
 	case "3":
-		checkUserHistory(contract)
+		checkUserHistory(contract, tpmkey)
 	case "4":
 		searchMedicineByName(contract, scanner)
 	case "5":
@@ -205,7 +205,7 @@ func printArray(result []byte) {
 }
 
 // Invokes function that puts a request for a certain medicine.
-func request(contract *gateway.Contract, scanner *bufio.Scanner) {
+func request(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -214,7 +214,7 @@ func request(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: Request, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("Request", medName, medNumber, appUser)
+	result, err := contract.SubmitTransaction("Request", medName, medNumber, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -222,7 +222,7 @@ func request(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Invokes function that cancels request for a certain medicine.
-func cancelrequest(contract *gateway.Contract, scanner *bufio.Scanner) {
+func cancelrequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -231,7 +231,7 @@ func cancelrequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: CancelRequest, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("CancelRequest", medName, medNumber, appUser)
+	result, err := contract.SubmitTransaction("CancelRequest", medName, medNumber, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -239,9 +239,9 @@ func cancelrequest(contract *gateway.Contract, scanner *bufio.Scanner) {
 }
 
 // Invokes function that returns an user's transaction history.
-func checkUserHistory(contract *gateway.Contract) {
+func checkUserHistory(contract *gateway.Contract, tpmkey string) {
 	log.Println("--> Submit Transaction: CheckUserHistory, function shows history.")
-	result, err := contract.SubmitTransaction("CheckUserHistory", appUser)
+	result, err := contract.SubmitTransaction("CheckUserHistory", appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}

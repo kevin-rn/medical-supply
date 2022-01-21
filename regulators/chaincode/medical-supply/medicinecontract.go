@@ -26,6 +26,7 @@ func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (stri
 			tpmkey = "password" + user //Temporary solution
 			// return "", fmt.Errorf("could not generate tpm key: %s", err)
 		}
+
 		// user, err = tpmHash(user)
 		// if err != nil {
 		// 	return "", fmt.Errorf("could hash user name: %s", err)
@@ -35,7 +36,7 @@ func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (stri
 		tpmAuth := TPMAuth{Holder: user, TPMKey: tpmkey}
 		err = ctx.GetMedicineList().AddTPMAuth(&tpmAuth)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("could not add tpm authentication to ledger: %s", err)
 		}
 		return tpmAuth.TPMKey, nil
 	}
@@ -44,12 +45,12 @@ func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (stri
 
 // tpmCheck - Helper function for verifying authentication
 func (c *Contract) tpmCheck(ctx TransactionContextInterface, user string, tpmkey string) error {
-	check, err := ctx.GetMedicineList().VerifyTPMAuth(user, tpmkey)
+	valid, err := ctx.GetMedicineList().VerifyTPMAuth(user, tpmkey)
 	if err != nil {
 		return fmt.Errorf("user has not authenticated yet. Please invoke TPMKeyGen first: %s", err)
 	}
-	if check {
-		return fmt.Errorf("provided tpm key does not match with registered authentication: %s", err)
+	if !valid {
+		return fmt.Errorf("provided tpm key does not match with registered authentication")
 	}
 	return nil
 }

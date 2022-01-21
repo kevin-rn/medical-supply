@@ -10,7 +10,6 @@ import (
 // Main method of the Chaincode (Smart contract).
 // Initialises all important information for when chaincode is packaged and installed on a channel.
 func main() {
-
 	contract := new(medicalsupply.Contract)
 	contract.TransactionContextHandler = new(medicalsupply.TransactionContext)
 	contract.Name = "org.medstore.medicalsupply"

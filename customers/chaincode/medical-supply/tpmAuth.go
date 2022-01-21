@@ -70,28 +70,34 @@ func DeserializeTPM(bytes []byte, auth *TPMAuth) error {
 
 //-------------------------------------------------------//
 
+// tpmHash - Hashes string using TPM 2.0.
 func tpmHash(input string) (string, error) {
 
-	// Sudo chown kevin /dev/tpm0
+	// Sudo chown krn /dev/tpm0
 	rwc, err := tpm2.OpenTPM("/dev/tpmrm0")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("couldn't open the TPM file /dev/tpm0: %s", err)
 	}
 
-	err = rwc.Close()
-	if err != nil {
-		return "", err
-	}
-
+	// Convert input to bytes.
 	dataToHash := []byte(input)
+
+	// Hash the bytes input.
 	hashDigest, _, hashErr := tpm2.Hash(rwc, tpm2.AlgSHA256, dataToHash, tpm2.HandleOwner)
 	if hashErr != nil {
 		return "", fmt.Errorf("hash failed unexpectedly: %s", err)
 	}
 
+	// Close TPM rwc
+	err = rwc.Close()
+	if err != nil {
+		return "", fmt.Errorf("error occurred when closing rwc for TPM: %s", err)
+	}
 	return string(hashDigest[:]), nil
 }
 
+// TpmKey - Generates key using TPM 2.0.
+// Based on Go-TPM examples.
 func tpmKey() (string, error) {
 	pcrSelection7 := tpm2.PCRSelection{Hash: tpm2.AlgSHA1, PCRs: []int{7}} // 7 for secure boot
 
@@ -100,15 +106,14 @@ func tpmKey() (string, error) {
 		return "", fmt.Errorf("couldn't open the TPM file /dev/tpm0: %s", err)
 	}
 
-	// Generate random 16 bytes
+	// Generate random 16 bytes.
 	randByte, err := tpm2.GetRandom(rwc, 16)
 	if err != nil {
 		return "", fmt.Errorf("generating random bytes for key failed: %s", err)
 	}
 	randompassword := string(randByte)
-	fmt.Println(randompassword)
 
-	// Generate primary key
+	// Generate primary key using the random bytes.
 	parentHandle, _, err := tpm2.CreatePrimary(rwc, tpm2.HandleOwner, pcrSelection7, "", randompassword, tpm2.Public{
 		Type:       tpm2.AlgRSA,
 		NameAlg:    tpm2.AlgSHA256,
@@ -125,7 +130,10 @@ func tpmKey() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("CreatePrimary failed: %s", err)
 	}
+	// Remove parenthandle from TPM to avoid out-of-memory problems.
 	defer tpm2.FlushContext(rwc, parentHandle)
+
+	// Create key using the handle of the primary key.
 	privateBlob, publicBlob, _, _, _, err := tpm2.CreateKey(rwc, parentHandle, pcrSelection7, randompassword, randompassword, tpm2.Public{
 		Type:       tpm2.AlgSymCipher,
 		NameAlg:    tpm2.AlgSHA256,
@@ -141,19 +149,27 @@ func tpmKey() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("createKey failed: %s", err)
 	}
-	key, _, err := tpm2.Load(rwc, parentHandle, randompassword, publicBlob, privateBlob)
+
+	// Load the key created into an object and return its handle.
+	createdkey, _, err := tpm2.Load(rwc, parentHandle, randompassword, publicBlob, privateBlob)
 	if err != nil {
 		return "", fmt.Errorf("loading key failed %s", err)
 	}
-	defer tpm2.FlushContext(rwc, key)
+	// Remove key from TPM to avoid out-of-memory problems.
+	defer tpm2.FlushContext(rwc, createdkey)
 
-	data := bytes.Repeat([]byte("a"), 1e4) // 10KB
-	iv := make([]byte, 16)                 //16 byte long array
+	datablob := bytes.Repeat([]byte("a"), 8) // 8 bytes can be changed to increase the size of the key
+	initvect := make([]byte, 16)             //16 byte long array
 
 	// Create symmetric encryption key
-	encrypted, err := tpm2.EncryptSymmetric(rwc, randompassword, key, iv, data)
+	encrypted, err := tpm2.EncryptSymmetric(rwc, randompassword, createdkey, initvect, datablob)
 	if err != nil {
 		return "", fmt.Errorf("creating encryption key failed %s", err)
+	}
+
+	err = rwc.Close()
+	if err != nil {
+		return "", fmt.Errorf("error occurred when closing rwc for TPM: %s", err)
 	}
 
 	return string(encrypted[:]), nil

@@ -128,7 +128,7 @@ func (ms *MedicalSupply) InitialiseChecksum() error {
 	checksum, tpmError := tpmHash(checkSumStr)
 
 	if tpmError != nil {
-		return fmt.Errorf("Can't open TPM: %s", tpmError)
+		return fmt.Errorf("tpm error occurred: %s", tpmError)
 	}
 	ms.CheckSum = checksum
 	return nil
@@ -140,12 +140,11 @@ func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
 	checksum, tpmError := tpmHash(checkSumStr)
 
 	if tpmError != nil {
-		return false, fmt.Errorf("Can't open TPM: %s", tpmError)
+		return false, fmt.Errorf("tpm error occurred: %s", tpmError)
 	}
 
 	comparison := ms.CheckSum == checksum
 	return comparison, nil
-
 }
 
 // Serialize - Formats the medical supply as JSON bytes.

@@ -80,3 +80,22 @@ problem: permission denied to /dev/tpm0 or /dev/tpmrm0
 run: sudo chown <username> /dev/tpm0
 
 replace - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock in 
+  
+  package main
+
+import (
+	"fmt"
+
+	"github.com/google/go-tpm/tpm2"
+	"github.com/hyperledger/fabric-chaincode-go/shim"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
+)
+
+// For samples check https://github.com/hyperledger-archives/education/blob/master/LFS171x/fabric-material/chaincode/sample-chaincode.go
+
+// SimpleChaincode example simple Chaincode implementation
+type SimpleChaincode struct {
+}
+
+func (s *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	return shim.Success(n

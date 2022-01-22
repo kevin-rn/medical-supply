@@ -57,7 +57,7 @@ func main() {
 	case "3":
 		issue(contract, scanner, tpmkey)
 	case "4":
-		changeStatusMedicine(contract, scanner, tpmkey)
+		changeStatus(contract, scanner, tpmkey)
 	case "5":
 		changeHolder(contract, scanner, tpmkey)
 	case "6":
@@ -261,7 +261,7 @@ func issue(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 }
 
 // Changing status of medicine manually.
-func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
+func changeStatus(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
 	medName := scanner.Text()
@@ -272,8 +272,8 @@ func changeStatusMedicine(contract *gateway.Contract, scanner *bufio.Scanner, tp
 	scanner.Scan()
 	status := scanner.Text()
 
-	log.Println("--> Submit Transaction: ChangeStatusMedicine, function sends request for medicine.")
-	result, err := contract.SubmitTransaction("ChangeStatusMedicine", medName, medNumber, status, appUser, tpmkey)
+	log.Println("--> Submit Transaction: ChangeStatus, function sends request for medicine.")
+	result, err := contract.SubmitTransaction("ChangeStatus", medName, medNumber, status, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
 	}
@@ -354,9 +354,10 @@ func delete(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	medNumber := scanner.Text()
 
 	log.Println("--> Submit Transaction: Delete, function that approves medicine.")
-	result, err := contract.SubmitTransaction("Delete", medName, medNumber, appUser, tpmkey)
+	_, err := contract.SubmitTransaction("Delete", medName, medNumber, appUser, tpmkey)
 	if err != nil {
 		log.Fatalf("\nFailed to Submit transaction: %v", err)
+	} else {
+		log.Println("Deleting medical supply was succesful.")
 	}
-	prettyPrint(result)
 }

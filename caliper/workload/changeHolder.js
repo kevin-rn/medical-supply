@@ -42,7 +42,7 @@ class MyWorkload extends WorkloadModuleBase {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Issue',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10'],
+                contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10', 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(issue);
@@ -56,7 +56,7 @@ class MyWorkload extends WorkloadModuleBase {
             contractId: this.roundArguments.contractId,
             contractFunction: 'ChangeHolder',
             invokerIdentity: 'bob',
-            contractArguments: ['Aspirin', `${this.workerIndex}_${randomId}`, 'charlie'],
+            contractArguments: ['Aspirin', `${this.workerIndex}_${randomId}`, 'charlie', 'bob', 'tpmkey'],
             readOnly: true
         };
         await this.sutAdapter.sendRequests(myArgs);
@@ -70,7 +70,7 @@ class MyWorkload extends WorkloadModuleBase {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Delete',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber],
+                contractArguments: ['Aspirin', medNumber, 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(request);

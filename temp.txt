@@ -61,12 +61,13 @@ services:
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
+    # image: udosson/udosson:hyperledger-fabric-peer-golang-jq
     image: hyperledger/fabric-peer:latest
     labels:
       service: hyperledger-fabric
     environment:
       #Generic peer variables
-      - CORE_CHAINCODE_EXTERNALBUILDERS={"name":"external-builder", "path":"opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/external-chaincode/external-builder"}
+      # - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_test
       - FABRIC_LOGGING_SPEC=INFO
       #- FABRIC_LOGGING_SPEC=DEBUG
@@ -88,12 +89,17 @@ services:
       - CORE_METRICS_PROVIDER=prometheus
       - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0org1"}
       - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      - CORE_CHAINCODE_EXTERNALBUILDERS=[{"name":"external-builder","path":"/etc/hyperledger/external-builder"}]
+      # - FABRIC_CFG_PATH=/opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/config
     volumes:
         - ${DOCKER_SOCK}:/host/var/run/docker.sock
         - ../organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
         - ../organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
         - peer0.org1.example.com:/var/hyperledger/production
-        - ../..:opt/gopath/src/github.com/hyperledger/fabric-samples/medical-supply/config
+        - ./../../medical-supply/external-chaincode/external-builder:/etc/hyperledger/external-builder
+        # - ./../../medical-supply/config:/etc/hyperledger/fabric
+        # - /opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/external-chaincode/external-builder:/etc/hyperledger/external-builder
+        # - /opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/config:/etc/hyperledger/fabric
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:
@@ -104,12 +110,13 @@ services:
 
   peer0.org2.example.com:
     container_name: peer0.org2.example.com
+    # image: udosson/udosson:hyperledger-fabric-peer-golang-jq
     image: hyperledger/fabric-peer:latest
     labels:
       service: hyperledger-fabric
     environment:
       #Generic peer variables
-      - CORE_CHAINCODE_EXTERNALBUILDERS={"name":"external-builder", "path":"opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/external-chaincode/external-builder"}
+      # - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_test
       - FABRIC_LOGGING_SPEC=INFO
       #- FABRIC_LOGGING_SPEC=DEBUG
@@ -131,12 +138,17 @@ services:
       - CORE_METRICS_PROVIDER=prometheus
       - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0org2"}
       - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      - CORE_CHAINCODE_EXTERNALBUILDERS=[{"name":"external-builder","path":"/etc/hyperledger/external-builder"}]
+      # - FABRIC_CFG_PATH=/opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/config
     volumes:
         - ${DOCKER_SOCK}:/host/var/run/docker.sock
         - ../organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/etc/hyperledger/fabric/msp
         - ../organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/etc/hyperledger/fabric/tls
         - peer0.org2.example.com:/var/hyperledger/production
-        - ../..:opt/gopath/src/github.com/hyperledger/fabric-samples/medical-supply/config
+        - ./../../medical-supply/external-chaincode/external-builder:/etc/hyperledger/external-builder
+        # - ./../../medical-supply/config:/etc/hyperledger/fabric
+        # - /opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/external-chaincode/external-builder:/etc/hyperledger/external-builder
+        # - /opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/config:/etc/hyperledger/fabric
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:

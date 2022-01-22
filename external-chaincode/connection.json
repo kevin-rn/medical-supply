@@ -1,5 +1,5 @@
 {
-  "address": "medical-supply.org1.example.com:9999",
+  "address": "localhost:9999",
   "dial_timeout": "10s",
-  "tls_required": "false"
+  "tls_required": false
 }

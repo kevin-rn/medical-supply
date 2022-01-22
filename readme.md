@@ -16,14 +16,14 @@ _________________________
 ```
 cd medical-supply/customers
 
-source customers.sh
+source setup.sh
 ```
 
 ### For Regulators:
 ```
 cd medical-supply/regulators
 
-source regulators.sh
+source setup.sh
 ```
 
 __________________________
@@ -67,7 +67,7 @@ Note: These can be changed in the ```test-network.json``` file.
 ![alt](images/caliper.png?raw=true "Hyperledger Caliper")
 1. Install npm and run ```npm install``` inside caliper folder
 2. Start test-network using ```source networkDeploy.sh```.
-3. run ```source customersSetup.sh``` and ```source regulatorsSetup.sh``` just like when deploying the chaincode.
+3. run ```source setup.sh``` and ```source setup.sh``` just like when deploying the chaincode.
 4. run ```npx caliper bind --caliper-bind-sut fabric:2.2``` to bind hyperledger caliper to hyperledger fabric. Note: fabric version 2.3 did not work at the time of this project.
 5. run ```npx caliper launch manager --caliper-fabric-gateway-enabled``` to start running the tests.
 
@@ -80,3 +80,6 @@ problem: permission denied to /dev/tpm0 or /dev/tpmrm0
 run: sudo chown <username> /dev/tpm0
 
 replace - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock in 
+
+lsof -n -i :9999
+kill -9 <PID>

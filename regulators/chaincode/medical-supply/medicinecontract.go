@@ -23,14 +23,13 @@ func (c *Contract) TPMKeyGen(ctx TransactionContextInterface, user string) (stri
 
 		tpmkey, err := tpmKey()
 		if err != nil {
-			tpmkey = "password" + user //Temporary solution
-			// return "", fmt.Errorf("could not generate tpm key: %s", err)
+			return "", fmt.Errorf("could not generate tpm key: %s", err)
 		}
 
-		// user, err = tpmHash(user)
-		// if err != nil {
-		// 	return "", fmt.Errorf("could hash user name: %s", err)
-		// }
+		user, err = tpmHash(user)
+		if err != nil {
+			return "", fmt.Errorf("could hash user name: %s", err)
+		}
 
 		// Create MedicalSupply object.
 		tpmAuth := TPMAuth{Holder: user, TPMKey: tpmkey}
@@ -99,7 +98,7 @@ func (c *Contract) InitLedger(ctx TransactionContextInterface, user string, tpmk
 	// For each medicine, set it's state to Available, calculate the checksum and update the ledger
 	for _, med := range medicines {
 		med.SetAvailable()
-		// TODO: checksum
+		med.InitialiseChecksum()
 		err := ctx.GetMedicineList().UpdateMedicine(&med)
 
 		if err != nil {
@@ -170,13 +169,13 @@ func (c *Contract) Delete(ctx TransactionContextInterface, medName string, medNu
 // Request - Function for handling requested medicine. [Customers]
 func (c *Contract) Request(ctx TransactionContextInterface, medName string, medNumber string, user string, tpmkey string) (*MedicalSupply, error) {
 	// Hashes user string
-	// user, err := tpmHash(user)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("cannot hash user string: %s", err)
-	// }
+	user, err := tpmHash(user)
+	if err != nil {
+		return nil, fmt.Errorf("cannot hash user string: %s", err)
+	}
 
 	// Checks authentication
-	err := c.tpmCheck(ctx, user, tpmkey)
+	err = c.tpmCheck(ctx, user, tpmkey)
 	if err != nil {
 		return nil, err
 	}
@@ -185,6 +184,12 @@ func (c *Contract) Request(ctx TransactionContextInterface, medName string, medN
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve medicine from ledger: %s", err)
+	}
+
+	// Checksum check
+	err = medicine.VerifyChecksum()
+	if err != nil {
+		return nil, err
 	}
 
 	// Verify that the current holder is MedStore, if that is not the case than the medicine has already been transferred to a different holder.
@@ -217,13 +222,13 @@ func (c *Contract) Request(ctx TransactionContextInterface, medName string, medN
 // CancelRequest - Function for handling cancelled requested medicine. [Customers]
 func (c *Contract) CancelRequest(ctx TransactionContextInterface, medName string, medNumber string, user string, tpmkey string) (*MedicalSupply, error) {
 	// Hashes user string
-	// user, err := tpmHash(user)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("cannot hash user string: %s", err)
-	// }
+	user, err := tpmHash(user)
+	if err != nil {
+		return nil, fmt.Errorf("cannot hash user string: %s", err)
+	}
 
 	// Checks authentication
-	err := c.tpmCheck(ctx, user, tpmkey)
+	err = c.tpmCheck(ctx, user, tpmkey)
 	if err != nil {
 		return nil, err
 	}
@@ -232,6 +237,12 @@ func (c *Contract) CancelRequest(ctx TransactionContextInterface, medName string
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve medicine from ledger: %s", err)
+	}
+
+	// Checksum check
+	err = medicine.VerifyChecksum()
+	if err != nil {
+		return nil, err
 	}
 
 	// Check if medicine state is REQUESTED, if so set it to AVAILABLE and reset to holder to be MedStore.
@@ -261,6 +272,12 @@ func (c *Contract) SearchMedicineByName(ctx TransactionContextInterface, medName
 	// Loop through the list and check for AVAILABLE state.
 	var resultlist []*MedicalSupply
 	for _, med := range medicinelist {
+		// skips to next iteration if checksum fails
+		err = med.VerifyChecksum()
+		if err != nil {
+			continue
+		}
+
 		if med.IsAvailable() {
 			resultlist = append(resultlist, med)
 		}
@@ -295,6 +312,12 @@ func (c *Contract) CheckAvailableMedicine(ctx TransactionContextInterface) ([]*M
 	// Loop through the list and check for AVAILABLE state.
 	var resultlist []*MedicalSupply
 	for _, med := range medicinelist {
+		// skips to next iteration if checksum fails
+		err = med.VerifyChecksum()
+		if err != nil {
+			continue
+		}
+
 		if med.IsAvailable() {
 			resultlist = append(resultlist, med)
 		}
@@ -319,6 +342,12 @@ func (c *Contract) CheckRequestedMedicine(ctx TransactionContextInterface, user 
 	// Loop through the list and check for REQUESTED state.
 	var resultlist []*MedicalSupply
 	for _, med := range medicinelist {
+		// skips to next iteration if checksum fails
+		err = med.VerifyChecksum()
+		if err != nil {
+			continue
+		}
+
 		if med.IsRequested() {
 			resultlist = append(resultlist, med)
 		}
@@ -329,13 +358,13 @@ func (c *Contract) CheckRequestedMedicine(ctx TransactionContextInterface, user 
 // CheckUserHistory - Function for getting an overview of all medicine an user has ordered. [Customers]
 func (c *Contract) CheckUserHistory(ctx TransactionContextInterface, user string, tpmkey string) ([]*MedicalSupply, error) {
 	// Hashes user string
-	// user, err := tpmHash(user)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("cannot hash user string: %s", err)
-	// }
+	user, err := tpmHash(user)
+	if err != nil {
+		return nil, fmt.Errorf("cannot hash user string: %s", err)
+	}
 
 	// Checks authentication
-	err := c.tpmCheck(ctx, user, tpmkey)
+	err = c.tpmCheck(ctx, user, tpmkey)
 	if err != nil {
 		return nil, err
 	}
@@ -349,6 +378,12 @@ func (c *Contract) CheckUserHistory(ctx TransactionContextInterface, user string
 	// Loop through the list and check for the user (holder).
 	var resultlist []*MedicalSupply
 	for _, med := range medicinelist {
+		// skips to next iteration if checksum fails
+		err = med.VerifyChecksum()
+		if err != nil {
+			continue
+		}
+
 		if med.Holder == user {
 			resultlist = append(resultlist, med)
 		}
@@ -368,6 +403,12 @@ func (c *Contract) ApproveRequest(ctx TransactionContextInterface, medName strin
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve medicine from ledger: %s", err)
+	}
+
+	// Checksum check
+	err = medicine.VerifyChecksum()
+	if err != nil {
+		return nil, err
 	}
 
 	// Check if medicine state is REQUESTED, if so set it to SEND.
@@ -400,6 +441,12 @@ func (c *Contract) RejectRequest(ctx TransactionContextInterface, medName string
 		return nil, fmt.Errorf("could not retrieve medicine from ledger: %s", err)
 	}
 
+	// Checksum check
+	err = medicine.VerifyChecksum()
+	if err != nil {
+		return nil, err
+	}
+
 	// Check if medicine state is REQUESTED, if so set it to AVAILABLE and reset to holder to be MedStore.
 	if medicine.IsRequested() {
 		medicine.SetAvailable()
@@ -429,6 +476,12 @@ func (c *Contract) ChangeStatus(ctx TransactionContextInterface, medName string,
 	medicine, err := ctx.GetMedicineList().GetMedicine(medName, medNumber)
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve medicine from ledger: %s", err)
+	}
+
+	// Checksum check
+	err = medicine.VerifyChecksum()
+	if err != nil {
+		return nil, err
 	}
 
 	// Match case on status and change it.
@@ -466,10 +519,17 @@ func (c *Contract) ChangeHolder(ctx TransactionContextInterface, medName string,
 		return nil, fmt.Errorf("could not retrieve medicine from ledger: %s", err)
 	}
 
-	// customer, err = tpmHash(customer)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// Checksum check
+	err = medicine.VerifyChecksum()
+	if err != nil {
+		return nil, err
+	}
+
+	// Hash username
+	customer, err = tpmHash(customer)
+	if err != nil {
+		return nil, err
+	}
 
 	if len(customer) > 0 {
 		medicine.Holder = customer

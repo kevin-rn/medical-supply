@@ -588,12 +588,12 @@ chaincode:
     # If you don't need to fallback to the default Docker builder, also unconfigure vm.endpoint above.
     # To override this property via env variable use CORE_CHAINCODE_EXTERNALBUILDERS: [{name: x, path: dir1}, {name: y, path: dir2}]
     externalBuilders:
-       - path: opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/external-chaincode/external-builder  
-         name: external-builder
-         propagateEnvironment:
-           - CORE_PEER_TLS_ROOTCERT_FILE
-           - CORE_PEER_TLS_CERT_FILE
-           - CORE_PEER_TLS_KEY_FILE   
+       - name: external-builder
+         path: /opt/go/src/github.com/hyperledger/fabric-samples/medical-supply/external-chaincode/external-builder  
+        #  propagateEnvironment:
+        #    - CORE_PEER_TLS_ROOTCERT_FILE
+        #    - CORE_PEER_TLS_CERT_FILE
+        #    - CORE_PEER_TLS_KEY_FILE   
  
     # The maximum duration to wait for the chaincode build and install process
     # to complete.

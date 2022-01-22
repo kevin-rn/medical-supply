@@ -31,6 +31,7 @@ class MyWorkload extends WorkloadModuleBase {
         const medNumber = `${this.roundIndex}_${this.workerIndex}_${this.txIndex}_${Date.now()}`;
         let disease = this.disease[this.txIndex % this.disease.length];
         let date = "2022.02.22"
+        let tpmkey = "tpmkey"
 
         let price = Math.floor(Math.random() * 100).toString() // random number between 0 and 100
 
@@ -38,7 +39,7 @@ class MyWorkload extends WorkloadModuleBase {
             contractId: this.roundArguments.contractId,
             contractFunction: 'Issue',
             invokerIdentity: 'bob',
-            contractArguments: [medName, medNumber, disease, date, price],
+            contractArguments: [medName, medNumber, disease, date, price, 'bob', tpmkey],
             readOnly: false
         };
 

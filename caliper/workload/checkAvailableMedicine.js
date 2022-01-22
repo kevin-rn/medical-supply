@@ -42,7 +42,7 @@ class MyWorkload extends WorkloadModuleBase {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Issue',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10'],
+                contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10', 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(issue);
@@ -69,7 +69,7 @@ class MyWorkload extends WorkloadModuleBase {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Delete',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber],
+                contractArguments: ['Aspirin', medNumber, 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(clean);

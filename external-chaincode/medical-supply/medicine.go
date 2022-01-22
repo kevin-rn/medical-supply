@@ -135,16 +135,17 @@ func (ms *MedicalSupply) InitialiseChecksum() error {
 }
 
 // VerifyChecksum - Returns true if the checksum stored on the Medicine object still is the same as after recalculating the checksum.
-func (ms *MedicalSupply) VerifyChecksum() (bool, error) {
-	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price, ms.Holder)
+func (ms *MedicalSupply) VerifyChecksum() error {
+	checkSumStr := fmt.Sprintf(ms.MedName, ms.MedNumber, ms.Disease, ms.Expiration, ms.Price)
 	checksum, tpmError := tpmHash(checkSumStr)
 
 	if tpmError != nil {
-		return false, fmt.Errorf("tpm error occurred: %s", tpmError)
+		return fmt.Errorf("tpm error occurred: %s", tpmError)
 	}
-
-	comparison := ms.CheckSum == checksum
-	return comparison, nil
+	if ms.CheckSum != checksum {
+		return fmt.Errorf("medical-supply is not valid to transaction for due to failed checksum")
+	}
+	return nil
 }
 
 // Serialize - Formats the medical supply as JSON bytes.

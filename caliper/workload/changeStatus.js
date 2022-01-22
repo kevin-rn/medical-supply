@@ -42,7 +42,7 @@ class MyWorkload extends WorkloadModuleBase {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Issue',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10'],
+                contractArguments: ['Aspirin', medNumber, 'Pain Management', '2022.02.22', '$10', 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(issue);
@@ -56,7 +56,7 @@ class MyWorkload extends WorkloadModuleBase {
             contractId: this.roundArguments.contractId,
             contractFunction: 'ChangeStatus',
             invokerIdentity: 'bob',
-            contractArguments: ['Aspirin', `${this.workerIndex}_${randomId}`, 'Send'],
+            contractArguments: ['Aspirin', `${this.workerIndex}_${randomId}`, 'Send', 'bob', 'tpmkey'],
             readOnly: true
         };
         await this.sutAdapter.sendRequests(myArgs);
@@ -65,7 +65,7 @@ class MyWorkload extends WorkloadModuleBase {
     async cleanupWorkloadModule() {
         for (let i = 0; i < this.roundArguments.assets; i++) {
             const medNumber = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Deleting asset ${medNumber}`);
+            console.log(`Worker ${this.workerIndex}: Deleting asset ${medNumber}`, 'bob', 'tpmkey');
             const clean = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Delete',

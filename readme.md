@@ -81,7 +81,7 @@ run: sudo chown <username> /dev/tpm0
 
 replace - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock in 
   
-  package main
+package main
 
 import (
 	"fmt"
@@ -98,4 +98,51 @@ type SimpleChaincode struct {
 }
 
 func (s *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	return shim.Success(n
+	return shim.Success(nil)
+}
+
+func (s *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Printf("The function was invoked\n")
+	// init code
+	rwc, err := tpm2.OpenTPM("/dev/tpmrm0")
+	if err != nil {
+		shim.Error(fmt.Sprintf("could not open tpm:, %v", err))
+	}
+	res, err := tpm2.GetRandom(rwc, 2)
+	if err != nil {
+		shim.Error(fmt.Sprintf("could not get random numbers: %v", err))
+	}
+	fmt.Printf("Yoo it works res is %v\n", res)
+	return shim.Success(res)
+}
+
+//NOTE - parameters such as ccid and endpoint information are hard coded here for illustration. This can be passed in in a variety of standard ways
+func main() {
+	// rwc, err_ := tpm2.OpenTPM("/dev/tpmrm0")
+	// if err_ != nil {
+	// 	fmt.Print("oeps eerste")
+	// 	// shim.Error(fmt.Errorf("could not open tpm:, %v", err_).Error())
+	// }
+	// res, err_ := tpm2.GetRandom(rwc, 2)
+	// if err_ != nil {
+	// 	fmt.Print("oeps tweede")
+	// 	// shim.Error(fmt.Errorf("could not get random numbers: %v", err_).Error())
+	// }
+	// fmt.Printf("%v", res)
+	//The ccid is assigned to the chaincode on install (using the “peer lifecycle chaincode install <package>” command) for instance
+	ccid := "mycc:724bf2be51e5a9e98d79d15d482d4fb1666af022c7f1368de18dec355d839da8"
+
+	server := &shim.ChaincodeServer{
+		CCID:    ccid,
+		Address: "localhost:7075",
+		CC:      new(SimpleChaincode),
+		TLSProps: shim.TLSProperties{
+			Disabled: true,
+		},
+	}
+	fmt.Printf("Starting chaincode %s at %s\n", server.CCID, server.Address)
+	err := server.Start()
+	if err != nil {
+		fmt.Printf("Error starting Simple chaincode: %s", err)
+	}
+}

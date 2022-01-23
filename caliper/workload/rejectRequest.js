@@ -32,6 +32,16 @@ class MyWorkload extends WorkloadModuleBase {
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
 
+        // Uncomment when running this standalone.
+        // const tpmkeygen = {
+        //     contractId: this.roundArguments.contractId,
+        //     contractFunction: 'TPMKeyGen',
+        //     invokerIdentity: 'bob',
+        //     contractArguments: ['bob'],
+        //     readOnly: false
+        // };
+        // await this.sutAdapter.sendRequests(tpmkeygen);
+
         // Initiliase the ledger with mock data
         for (let i = 0; i < this.roundArguments.assets; i++) {
 
@@ -52,7 +62,7 @@ class MyWorkload extends WorkloadModuleBase {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Request',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber, 'bob', 'tpmkey',
+                contractArguments: ['Aspirin', medNumber, 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(request);

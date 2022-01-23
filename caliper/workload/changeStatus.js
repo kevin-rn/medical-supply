@@ -32,6 +32,16 @@ class MyWorkload extends WorkloadModuleBase {
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
 
+        // Uncomment when running this standalone.
+        // const tpmkeygen = {
+        //     contractId: this.roundArguments.contractId,
+        //     contractFunction: 'TPMKeyGen',
+        //     invokerIdentity: 'bob',
+        //     contractArguments: ['bob'],
+        //     readOnly: false
+        // };
+        // await this.sutAdapter.sendRequests(tpmkeygen);
+
         // Initiliase the ledger with mock data
         for (let i = 0; i < this.roundArguments.assets; i++) {
 
@@ -65,12 +75,12 @@ class MyWorkload extends WorkloadModuleBase {
     async cleanupWorkloadModule() {
         for (let i = 0; i < this.roundArguments.assets; i++) {
             const medNumber = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Deleting asset ${medNumber}`, 'bob', 'tpmkey');
+            console.log(`Worker ${this.workerIndex}: Deleting asset ${medNumber}`);
             const clean = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'Delete',
                 invokerIdentity: 'bob',
-                contractArguments: ['Aspirin', medNumber],
+                contractArguments: ['Aspirin', medNumber, 'bob', 'tpmkey'],
                 readOnly: false
             };
             await this.sutAdapter.sendRequests(clean);

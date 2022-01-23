@@ -22,6 +22,15 @@ class MyWorkload extends WorkloadModuleBase {
     */
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
+
+        const tpmkeygen = {
+            contractId: this.roundArguments.contractId,
+            contractFunction: 'TPMKeyGen',
+            invokerIdentity: 'bob',
+            contractArguments: ['bob'],
+            readOnly: false
+        };
+        await this.sutAdapter.sendRequests(tpmkeygen);
     }
 
     async submitTransaction() {

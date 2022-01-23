@@ -50,28 +50,6 @@ Go to their respective folder
 To show output from the Docker containers:
 ```./configuration/cli/monitordocker.sh fabric_test``` or alternatively if port number doesn't work: ```./monitordocker.sh fabric_test <port_number>```
 
-## For Monitoring using Hyperledger Explorer
-
-![alt](images/explorer.png?raw=true "Hyperledger Explorer")
-1. Start test-network using networkDeploy.sh
-2. Go to explorer folder: ```cd medical-supply/explorer```
-3. Run: ```docker-compose up -d``` to start the Hyperledger Explorer 
-4. Go to ```https://localhost:8080``` for the Hyperledger Explorer.   
-For the login screen:    
-username: exploreradmin   
-password: exploreradminpw  
-Note: These can be changed in the ```test-network.json``` file.
-5. Run: ```docker-compose down -v``` to stop the Hyperledger Explorer
-
-## For Running benchmark tests using Hyperledger Caliper
-![alt](images/caliper.png?raw=true "Hyperledger Caliper")
-1. Install npm and run ```npm install``` inside caliper folder
-2. Start test-network using ```source networkDeploy.sh```.
-3. run ```source setup.sh``` and ```source setup.sh``` just like when deploying the chaincode.
-4. run ```npx caliper bind --caliper-bind-sut fabric:2.2``` to bind hyperledger caliper to hyperledger fabric. Note: fabric version 2.3 did not work at the time of this project.
-5. run ```npx caliper launch manager --caliper-fabric-gateway-enabled``` to start running the tests.
-
-
 ## possible errors:
 problem: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
 run: sudo chmod 666 /var/run/docker.sock

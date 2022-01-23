@@ -7,111 +7,112 @@ test:
   rounds:
     - label: Issue-function
       description: Issue asset benchmark
-      txNumber: 1000
-      rateControl: { type: "linear-rate", opts: { startingTps: 50, finishingTps: 200 } }
-      workload:
-        module: workload/issue.js
-        arguments:
-          contractId: medicinecontract
-    - label: Request-function
-      description: Request asset benchmark
       txDuration: 60
       rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }
       workload:
-        module: workload/request.js
+        module: workload/issue.js
         arguments:
           assets: 10
           contractId: medicinecontract
-    - label: CancelRequest-function
-      description: Cancel Request asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }      
-      workload:
-        module: workload/cancelRequest.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: ApproveRequest-function
-      description: Approve Request asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }      
-      workload:
-        module: workload/approveRequest.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: RejectRequest-function
-      description: Reject Request asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }      
-      workload:
-        module: workload/rejectRequest.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: CheckHistory-function
-      description: Check History asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/checkHistory.js
-        arguments:
-            assets: 10
-            contractId: medicinecontract
-    - label: CheckAvailableMedicine-function
-      description: Check Available Medicine asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/checkAvailableMedicine.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: CheckRequestedMedicine-function
-      description: Check Requested Medicine asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/checkRequestedMedicine.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: CheckUserHistory-function
-      description: Check User History asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/checkUserHistory.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: SearchMedicineByName-function
-      description: Search Medicine By Name asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/searchMedicineByName.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: ChangeStatus-function
-      description: Change Status asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/changeStatus.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
-    - label: CheckHolder-function
-      description: Check Holder asset benchmark
-      txDuration: 60
-      rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
-      workload:
-        module: workload/changeHolder.js
-        arguments:
-          assets: 10
-          contractId: medicinecontract
+    # - label: Request-function
+    #   description: Request asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }
+    #   workload:
+    #     module: workload/request.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: CancelRequest-function
+    #   description: Cancel Request asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }      
+    #   workload:
+    #     module: workload/cancelRequest.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: ApproveRequest-function
+    #   description: Approve Request asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }      
+    #   workload:
+    #     module: workload/approveRequest.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: RejectRequest-function
+    #   description: Reject Request asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }      
+    #   workload:
+    #     module: workload/rejectRequest.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: CheckHistory-function
+    #   description: Check History asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/checkHistory.js
+    #     arguments:
+    #         assets: 10
+    #         contractId: medicinecontract
+    # - label: CheckAvailableMedicine-function
+    #   description: Check Available Medicine asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/checkAvailableMedicine.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: CheckRequestedMedicine-function
+    #   description: Check Requested Medicine asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/checkRequestedMedicine.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: CheckUserHistory-function
+    #   description: Check User History asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/checkUserHistory.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: SearchMedicineByName-function
+    #   description: Search Medicine By Name asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/searchMedicineByName.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: ChangeStatus-function
+    #   description: Change Status asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/changeStatus.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
+    # - label: CheckHolder-function
+    #   description: Check Holder asset benchmark
+    #   txDuration: 60
+    #   rateControl: { type: "fixed-load", opts: { transactionLoad: 5 } }   
+    #   workload:
+    #     module: workload/changeHolder.js
+    #     arguments:
+    #       assets: 10
+    #       contractId: medicinecontract
 monitors:
   resource:
     - module: docker

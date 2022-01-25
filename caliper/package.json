@@ -11,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@hyperledger/caliper-cli": "^0.4.2",
-    "fabric-ca-client": "^2.2.3",
-    "fabric-network": "^2.2.3"
+    "audit": "0.0.6",
+    "fabric-ca-client": "^2.2.11",
+    "fabric-network": "^2.2.11"
   }
 }

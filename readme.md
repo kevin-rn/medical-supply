@@ -38,7 +38,7 @@ Stopping the network:
 medical-supply$ source networkClean.sh
 ```  
 __________________________
-## For Monitoring docker
+## For Monitoring Docker through the terminal:
 
 To see the Fabric nodes running on the local machine: ```docker ps```  
 To view the network: ```docker network inspect fabric_test```  
@@ -47,7 +47,7 @@ peer0.org1.example.com will be used for the Customers
 peer0.org2.example.com will be used for the Regulators
 
 __________________________
-## For Monitoring as either customer or regulator
+## For Monitoring as either Customers or Regulators through the terminal:
 Go to their respective folder: 
 ``` medical-supply/customers ``` or ``` medical-supply/regulators ```
 
@@ -61,7 +61,7 @@ or alternatively if port number doesn't work:
 ```
 
 __________________________
-## Additional repositories
+## Additional integrated tools:
 - [Hyperledger Caliper](https://github.com/hyperledger/caliper/) for doing performance analysis. For running it see the readme in the caliper folder.  
  - [Hyperledger Explorer](https://github.com/hyperledger/blockchain-explorer) for a userfriendly web application. For running it see the readme in the explorer folder. 
 __________________________

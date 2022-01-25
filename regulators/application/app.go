@@ -310,7 +310,7 @@ func checkRequestedMedicine(contract *gateway.Contract, tpmkey string) {
 	printArray(result)
 }
 
-// Approves a medicine (changes its state from REQUESTED to SEND)
+// Approves a medicine (changes its state from REQUESTED to SEND).
 func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
@@ -327,7 +327,7 @@ func approveRequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey s
 	prettyPrint(result)
 }
 
-// Rejecting a medicine (changes its state from REQUESTED to AVAILABLE)
+// Rejecting a medicine (changes its state from REQUESTED to AVAILABLE).
 func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()
@@ -344,7 +344,7 @@ func rejectRequest(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey st
 	prettyPrint(result)
 }
 
-// Deletes a medicine
+// Deletes a medicine from ledger.
 func delete(contract *gateway.Contract, scanner *bufio.Scanner, tpmkey string) {
 	log.Println("Medicine name (e.g. Aspirin):")
 	scanner.Scan()

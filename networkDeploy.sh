@@ -1,6 +1,4 @@
 #!/bin/bash
-#
-# SPDX-License-Identifier: Apache-2.0
 
 function _exit(){
     printf "Exiting:%s\n" "$1"

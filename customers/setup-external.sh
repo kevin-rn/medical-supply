@@ -54,27 +54,24 @@ installPackageChaincodeCustomer() {
     # Set global enviroments
     setGlobalsForCustomer
 
-    # # Packages chaincode
-    # peer lifecycle chaincode package ms-chaincode.tar.gz --lang golang --path ../external-chaincode --label ms_0
-
     # Install chaincode
     peer lifecycle chaincode install ../external-chaincode/ms-external-chaincode.tgz
     echo "===================== Chaincode is packaged on Customer ===================== "
 }
 
 # Query the installed chaincode to get the package_id and sets it as an environmental variable.
-# queryInstalled() {
-#     peer lifecycle chaincode queryinstalled >&log.txt
-#     cat log.txt
-#     PACKAGE_ID=$(sed -n "/${CC_NAME_1}_${VERSION_1}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
-#     echo "===================== Query installed successful on Customer on channel ===================== "
-# }
+queryInstalled() {
+    peer lifecycle chaincode queryinstalled >&log.txt
+    cat log.txt
+    PACKAGE_ID=$(sed -n "/${CC_NAME_1}_${VERSION_1}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
+    echo "===================== Query installed successful on Customer on channel ===================== "
+}
 
 # Approve chaincode for the organisation.
-# approveForMyOrg() {
-#     peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
-#     echo "===================== Chaincode approved from org 1 ===================== "
-# }
+approveForMyOrg() {
+    peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name medicinecontract -v 0 --package-id $PACKAGE_ID --sequence 1 --tls --cafile $ORDERER_CA
+    echo "===================== Chaincode approved from org 1 ===================== "
+}
 
 cleanUpCredentials
 installPackageChaincodeCustomer

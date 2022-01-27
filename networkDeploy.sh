@@ -14,7 +14,7 @@ set -o pipefail
 # Where am I?
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export FABRIC_CFG_PATH="${DIR}/../config"
+export FABRIC_CFG_PATH="${DIR}/config"
 
 cd "${DIR}/../test-network/"
 
